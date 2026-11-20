@@ -1,0 +1,98 @@
+# DECISIONS — Leva
+
+- Project: Leva (`leva-sh`) · Created: 2026-11-21 · Status: binding
+- Related: [PRD](PRD.md) · [ARCHITECTURE](ARCHITECTURE.md) · [DESIGN-IN-THE-SMALL](DESIGN-IN-THE-SMALL.md) · [TEST-STRATEGY](TEST-STRATEGY.md) · [DESIGN-PATTERNS](DESIGN-PATTERNS.md) · [ANALYSIS](ANALYSIS.md) · [PLAN](../../../PLAN.md)
+
+This file holds the binding refinements of the design docs. Where an entry here differs from
+PRD, ARCHITECTURE, DESIGN-IN-THE-SMALL, TEST-STRATEGY or an ADR, this file wins.
+
+Rules for editing this file:
+
+- Entries are only appended (next free `D-NNN`) or amended. Nothing is deleted or renumbered.
+- Every amendment is written under the entry it changes as `- Amended <YYYY-MM-DD>: <change>. Reason: <why>.`
+- Every new entry states its date and reason on its first line.
+- Design docs are never silently contradicted: if a decision changes a fact they state, the
+  decision says so explicitly.
+
+## Seed decisions (D-001..D-024, from PLAN.md Appendix A, 2026-11-21)
+
+- **D-001 Language.** Code, comments, docstrings, UI strings and content are in English. Existing design docs stay in Italian. New docs (CLAUDE.md, DECISIONS, spikes, reviews, README) are in English.
+- **D-002 Packages and layers.** Every module is a package `leva.<pkg>`. Private submodules use a `_` prefix; other packages import only from the package root.
+- Corrected edges:
+  - `subcmd → manparse` (ParsedMan, `definition_items`);
+  - `clipboard → model` (ClipboardError);
+  - `tui → paths`, `tui → model`;
+  - new leaf `config → model`.
+- `sources.BuiltinSource` is dropped. Builtins are derived in ingest from the already-parsed zshbuiltins(1) and bash(1) (first in manpath order) via `manparse.extract_builtins`. Origins ZSH and BASH.
+- Layers, top to bottom (import-linter, `containers=["leva"]`, exhaustive):
+  1. `cli | verify`
+  2. `tui`
+  3. `library | ingest`
+  4. `search | sources | subcmd | content | store`
+  5. `repo | manparse | config | paths | placeholders | clipboard`
+  6. `model`
+- Forbidden contracts:
+  - no runtime package imports `verify`;
+  - `tui` must not import store, repo, search, sources, manparse, subcmd, content or config.
+- Stdlib restrictions are enforced by AST arch tests (T-0.3).
+- **D-003 Config.** `leva.config` reads TOML at `LevaPaths.config_file` (`<data_dir>/config.toml`). Keys: `sections`, `extra_man_paths`, `extra_bin_dirs`. Errors are `ConfigError(LevaError)`. Its `digest()` is part of the fingerprint. NB-6, NB-7 and NB-8 take the PRD defaults (sections 1 and 8; arm64 + x86_64; macOS ≥13; Python ≥3.11).
+- **D-004 Discovery and origin.**
+- Bin dirs, in order: `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`, `/bin`, `/usr/sbin`, `/sbin`, then `extra_bin_dirs`.
+- Man dirs: `manpath` output order + `/opt/homebrew/share/man` + `/usr/local/share/man` + `extra_man_paths` (deduplicated, missing dirs ignored).
+- Origin: HOMEBREW if the path is under `/opt/homebrew` or `/usr/local`, else MACOS.
+- **D-005 Entry catalog.**
+- Man pages: one entry per (name, section); the first in man-dir order wins (`man` semantics). The CLT SDK copy is dropped. Origin comes from the dir. `ManFile` carries `name` and `dir_index`.
+- `.so` stubs never become entries: they add an alias on the target entry.
+- NAME-line names add aliases.
+- Executables:
+  - `path` = first executable of that name in bin-dir order, set on every man entry with that name;
+  - an executable whose name resolves via an alias attaches to that entry;
+  - otherwise it becomes an exe-only entry (name, None, origin), `has_man=0`, summary "".
+- Builtins: entries (name, None, ZSH|BASH), `kind=builtin`, `has_man=1`. Sections: SYNOPSIS (the term lines) and DESCRIPTION.
+- Rank per name: sort by (not curated, not has_man, section order 1 < 8 < other < None, kind executable/manpage before builtin, origin zsh < bash, id); rank 0 is the primary.
+- Curated attachment targets the best entry for (name[, section]) using the same key without "curated", then everything is re-ranked.
+- `Repository.get_entry(name, section=None)`: exact name match by rank, else alias match ordered by (rank, name, id). `section=None` means any section.
+- **D-006 Schema refinements.** Unique index on `entry(name, IFNULL(section,''), origin)`. Add `entry.rank INT` and `subcommand.body TEXT`. FTS5 is contentless, filled at finalize. Unchanged otherwise.
+- **D-007 Rendering.** `.so` stubs are detected from the roff source (gz-aware) before rendering. Overstrike is stripped in Python (no `col` subprocess). Output is `mandoc -T ascii -O width=80`. Status: confirm in S-2.
+- **D-008 Subcommands.**
+- `known: Mapping[str, KnownPage(name, summary, synopsis)]` replaces `Mapping[str, Entry]`.
+- Hyphen rule: page `P-s` is a subcommand of P only if its SYNOPSIS starts with `P s`.
+- Section lists: headings matching `(SUB)?COMMANDS|VERBS`, excluding `CUSTOM EXTERNAL COMMANDS`. Terms whose first token matches `^[a-z][a-z0-9_.-]*$`.
+- Merge by name with priority curated > probe > section > hyphen, per field (summary, body, entry_name = first non-empty). Union of names, sorted.
+- **D-009 Probes.**
+- Allowlist built only from curated `help_probe: {args: [...], profile: two-col|git-list|brew-commands}`. The binary resolves to the first scanned executable.
+- env: `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, HOME and cwd in a temp dir, `LC_ALL=LANG=en_US.UTF-8`, `LANGUAGE=en`, `NO_COLOR=1`, `TERM=dumb`, `HOMEBREW_NO_AUTO_UPDATE=1`, `HOMEBREW_NO_ANALYTICS=1`, `HOMEBREW_NO_ENV_HINTS=1`.
+- stdin devnull; 5 s timeout; 256 KiB cap.
+- Exit status is ignored (`defaults` exits 255, `diskutil` exits 1). Text = stdout, else stderr. Failure = spawn error, timeout or empty output.
+- **D-010 Content and search API details.** The curated schema is strict: unknown keys are errors, `name` must equal the file stem, `help_probe` is a mapping. `SearchResult` adds `section`, `kind`, `origin`. For FTS hits, `why` = intent or summary if a query token occurs there (in memory), else body.
+- **D-011 Library.**
+- `close()`.
+- `attribution()` reads `meta['attribution']`, which ingest writes from `content.attribution_text()`.
+- A subcommand without its own page gets a synthesized Card: parent entry, breadcrumb (parent, sub), sections = [sub body], examples = the parent's examples whose plain cmd starts with `parent sub`.
+- History: max 50, opening after going back truncates forward.
+- Example duplicate key: whitespace collapsed + every placeholder replaced by `{}`; the curated example wins.
+- **D-012 TUI composition.**
+- `LevaApp(open_library: Callable[[], Library], clipboard, builder, start, paths, needs_build)`, so a first run can build before any library exists.
+- `StartTarget.kind` gains `"query"`, resolved in-app (exact name/alias → card, else prefilled search).
+- `CardView` is reused by CardScreen and by SearchScreen's right pane at ≥100 cols.
+- Manual text keeps its 80-column layout: no soft wrap, horizontal scroll.
+- Theme per S-1: `ansi=True`, `ansi_default` backgrounds, palette hex colours.
+- **D-013 Rebuild confirmation.** Press `r` twice within 3 s (status-line hint) instead of a modal: the design system forbids confirmation dialogs for non-destructive operations. Also `placeholders.problems()` is added for strict content validation.
+- **D-014 TTY.** Only TUI launches require a TTY (exit 2 otherwise). `--help`, `--version`, `--about`, `doctor` and `--rebuild` (headless, line progress on stderr) work without one.
+- **D-015 Doctor.** `--offline` runs only the checks that need neither system man pages nor an index (Python, SQLite/FTS5, content loads, versions). It is the brew `test do` mode.
+- **D-016 Verification safety.**
+- `src/leva/verify` is excluded from the wheel and has no console script; run it as `uv run python -m leva.verify` (NFR-11).
+- exec mode runs under `sandbox-exec`: deny network, deny writes outside the example sandbox, deny signals to other processes. It fails closed when sandbox-exec is missing.
+- Content validation rejects exec for the denylist: sudo, su, doas, shutdown, reboot, halt, diskutil, hdiutil, launchctl, defaults, pmset, networksetup, scutil, softwareupdate, tmutil, systemsetup, kill, killall, pkill, crontab, ssh, ssh-add, ssh-agent, scp, sftp, curl, ping, traceroute, dig, nslookup, host, nc, open, osascript, say, screencapture, pbcopy, pbpaste, security, xcode-select, mdutil, mdfind, spctl, dscl, passwd, login, brew, softwareupdate.
+- **D-017 tldr.** Vendor `common` + `osx` (English) from the release zip; the osx page replaces the common page. Normalise `{{[-x|--long]}}` to `-x` and strip mnemonic brackets. Index examples with `source="tldr"`, `verified="none"`: Leva does not verify them. A static check of tldr examples is a non-blocking live report.
+- **D-018 Hypothesis.** `derandomize=True` always. Regressions are pinned with `@example`. `.hypothesis/` is gitignored.
+- **D-019 Coverage.** TEST-STRATEGY targets + an 85% floor for other packages and overall, branch coverage, enforced by `tools/coverage_gate.py`.
+- **D-020 Staleness.** A missing, corrupt or unreadable index means MISSING. MISSING and VERSION_CHANGED trigger an automatic blocking build; SYSTEM_CHANGED shows a hint only, and may be computed after the first frame for NFR-1.
+- **D-021 Curated not installed.** A curated command with no matching entry on this Mac is skipped and reported in `BuildReport.skipped`.
+- **D-022 Build API.** `build(target, progress, *, cancel=None)` with cooperative cancellation; `fcntl.flock` on `index.lock`; a stale `.new` file is removed at start; `IndexBuilder` receives `config_digest` and `clock`.
+- **D-023 CI.** The workflow is committed with `workflow_dispatch` only, so no Actions minutes are used until the user enables triggers (U-6).
+- **D-024 Spikes and reviews.** Findings live in `docs/design/leva-sh/spikes/`, reviews in `docs/design/leva-sh/reviews/`. Spike code lives in `spikes/`: ruff-checked, excluded from mypy and coverage, never imported by src.
+
+## Later decisions
+
+(None yet. Append `D-025` onwards here.)

@@ -10,6 +10,15 @@ build/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
+.venv-*/
+.cache/
+.coverage*
+coverage.json
+htmlcov/
+.hypothesis/
+
+# Spike outputs
+spikes/out/
 
 # macOS
 .DS_Store

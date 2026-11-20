@@ -116,7 +116,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 ### Phase 0 — Foundations, conventions, spikes
 
-- [ ] T-0.1 Repo constitution: CLAUDE.md, DECISIONS.md, gitignore, design-system snapshot
+- [x] T-0.1 Repo constitution: CLAUDE.md, DECISIONS.md, gitignore, design-system snapshot
 - Files: `CLAUDE.md`, `docs/design/leva-sh/DECISIONS.md`, `.gitignore`, `docs/design/design-system-snapshot.md` (commit as is).
 - Refs: all design docs; external design system; Appendix A of this file.
 - Steps:
