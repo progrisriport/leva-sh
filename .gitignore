@@ -17,3 +17,9 @@ build/
 # Local index files
 *.sqlite
 *.db
+
+# Ralph loop runtime state
+.ralph/logs/
+.ralph/ralph.log
+.claude/ralph-loop.local.md
+.ralph/LOCK
