@@ -145,7 +145,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - `diff -q docs/design/design-system-snapshot.md "/Users/flosh/Desktop/Coding.nosync/Progetti/PyDF Tool/CLAUDE.md"` reports no difference;
   - `git status --porcelain` is empty after the commit.
 
-- [ ] T-0.2 Python project scaffold
+- [x] T-0.2 Python project scaffold
 - Files: `pyproject.toml`, `.python-version` (3.13), `uv.lock`, `Makefile`, `src/leva/__init__.py`, `src/leva/py.typed`, `src/leva/<pkg>/__init__.py` for each of model, paths, placeholders, clipboard, config, sources, manparse, subcmd, content, store, repo, search, library, ingest, tui, cli, verify (docstring stating the D-002 responsibility, nothing else), `tools/__init__.py`, `tests/unit/test_package.py`.
 - Refs: ADR-0001, ADR-0006, TEST-STRATEGY §5, D-002, D-016, D-018.
 - Steps:

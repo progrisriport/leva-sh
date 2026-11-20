@@ -1,0 +1,197 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "leva"
+version = "0.1.0"
+description = "A macOS terminal encyclopedia of shell commands: man pages, curated examples, tldr."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE", "LICENSE-CONTENT", "NOTICE.md"]
+authors = [{ name = "progrisriport" }]
+keywords = ["shell", "man", "manpages", "terminal", "tui", "macos", "cheatsheet"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Natural Language :: English",
+    "Operating System :: MacOS",
+    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Documentation",
+    "Topic :: System :: Shells",
+    "Topic :: Utilities",
+    "Typing :: Typed",
+]
+dependencies = [
+    "textual>=8.2,<9",
+    "rapidfuzz>=3.14,<4",
+    "pyyaml>=6.0.2,<7",
+]
+
+[project.urls]
+Repository = "https://github.com/progrisriport/leva-sh"
+
+[dependency-groups]
+dev = [
+    # Capped below 9: pytest-textual-snapshot pins syrupy==4.8.0, which requires pytest<9.
+    "pytest>=8.4,<9",
+    "pytest-asyncio>=1.5",
+    "pytest-textual-snapshot>=1.1",
+    "pytest-cov>=7.1",
+    "pytest-timeout>=2.4",
+    "pytest-socket>=0.8",
+    "hypothesis>=6.170",
+    "mypy>=2.4",
+    "ruff>=0.17",
+    "import-linter>=2.17",
+    "types-PyYAML>=6.0.12",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/leva"]
+# D-016: the verification harness is dev-only and never shipped.
+exclude = ["src/leva/verify"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+src = ["src", "tests", "tools", "spikes"]
+# Code blocks in docs are design signatures, not sources: never lint or reformat them.
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "N", "UP", "B", "C4", "SIM", "RUF", "PT", "PTH", "RET", "ARG",
+    "TID", "BLE", "T20", "ERA", "PGH", "PIE", "C90", "S", "D",
+]
+ignore = ["S603", "S607", "D102", "D105", "D107", "D203", "D213"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.isort]
+# CLAUDE.md: every module starts with this import (docstring-only modules are exempt).
+required-imports = ["from __future__ import annotations"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "D", "ARG"]
+"tools/**" = ["T20", "D"]
+"spikes/**" = ["T20", "D"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src", "tools"]
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool", "possibly-undefined"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+check_untyped_defs = true
+
+[tool.pytest.ini_options]
+minversion = "8.4"
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--disable-socket",
+    "--allow-unix-socket",
+    "-m",
+    "not macos_live",
+]
+markers = [
+    "integration: crosses module boundaries on synthetic fixture trees",
+    "tui: Textual Pilot and snapshot tests",
+    "macos_live: reads the real macOS system (man pages, executables); excluded by default",
+    "perf: performance budgets",
+    "clipboard: touches the real system clipboard",
+    "quarantine: known-flaky test, kept with a reason and an expiry date",
+]
+timeout = 60
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+xfail_strict = true
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source = ["leva"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "@(typing\\.)?overload",
+    "class .*\\bProtocol\\b.*\\):",
+]
+
+[tool.importlinter]
+root_package = "leva"
+
+[[tool.importlinter.contracts]]
+name = "Layers (D-002)"
+type = "layers"
+containers = ["leva"]
+exhaustive = true
+layers = [
+    "cli | verify",
+    "tui",
+    "library | ingest",
+    "search | sources | subcmd | content | store",
+    "repo | manparse | config | paths | placeholders | clipboard",
+    "model",
+]
+
+[[tool.importlinter.contracts]]
+name = "Runtime packages never import verify (D-016)"
+type = "forbidden"
+source_modules = [
+    "leva.cli",
+    "leva.tui",
+    "leva.library",
+    "leva.ingest",
+    "leva.search",
+    "leva.sources",
+    "leva.subcmd",
+    "leva.content",
+    "leva.store",
+    "leva.repo",
+    "leva.manparse",
+    "leva.config",
+    "leva.paths",
+    "leva.placeholders",
+    "leva.clipboard",
+    "leva.model",
+]
+forbidden_modules = ["leva.verify"]
+
+[[tool.importlinter.contracts]]
+name = "tui talks only to library, clipboard, ingest, paths, model and placeholders (D-002)"
+type = "forbidden"
+source_modules = ["leva.tui"]
+forbidden_modules = [
+    "leva.store",
+    "leva.repo",
+    "leva.search",
+    "leva.sources",
+    "leva.manparse",
+    "leva.subcmd",
+    "leva.content",
+    "leva.config",
+]
+# tui reaches these only through library and ingest, which is allowed.
+allow_indirect_imports = true
