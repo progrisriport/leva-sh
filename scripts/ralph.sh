@@ -11,6 +11,8 @@
 #   RALPH_WAIT_SECONDS (900)      wait after a usage limit / API error
 #   RALPH_MAX_RETRIES (200)       consecutive failed calls before giving up
 #   RALPH_MAX_IDLE (3)            tasks in a row without a new commit before stopping
+#   RALPH_LAST_TASK_AT (unset)    HH:MM local: do not start a new task after this time
+#   RALPH_STOP_AT (unset)         HH:MM local: do not start any step (or wait for a retry) after this time
 set -uo pipefail
 cd "$(dirname "$0")/.." || exit 1
 
@@ -22,6 +24,17 @@ MAX_ROUNDS="${RALPH_MAX_ROUNDS:-3}"
 WAIT="${RALPH_WAIT_SECONDS:-900}"
 MAX_RETRIES="${RALPH_MAX_RETRIES:-200}"
 MAX_IDLE="${RALPH_MAX_IDLE:-3}"
+
+# next_epoch HH:MM -> epoch of the next occurrence of that local time (empty input -> empty output)
+next_epoch() {
+  [[ -z "$1" ]] && return 0
+  local t; t=$(date -j -f "%Y-%m-%d %H:%M" "$(date +%Y-%m-%d) $1" +%s) || exit 1
+  (( t <= $(date +%s) )) && t=$((t + 86400))
+  echo "$t"
+}
+LAST_TASK_EPOCH=$(next_epoch "${RALPH_LAST_TASK_AT:-}")
+STOP_EPOCH=$(next_epoch "${RALPH_STOP_AT:-}")
+past() { [[ -n "$1" ]] && (( $(date +%s) >= $1 )); }
 
 STATE=.ralph; LOGS="$STATE/logs"
 mkdir -p "$LOGS"; touch "$STATE/PROGRESS.md"
@@ -58,6 +71,7 @@ run_step() {
   prompt=$(cat "$prompt_file")
   [[ -n "$extra" ]] && prompt+=$'\n\n'"$extra"
   while :; do
+    if past "$STOP_EPOCH"; then log "  stop time reached before $label; stopping."; exit 4; fi
     log "  $label ($model/$effort) -> $out"
     claude -p "$prompt" \
       --model "$model" --effort "$effort" --permission-mode dontAsk \
@@ -68,6 +82,9 @@ run_step() {
       retries=$((retries + 1))
       if (( retries > MAX_RETRIES )); then log "  too many retries, stopping."; exit 2; fi
       log "  $label failed (rc=$rc): $(head -c 160 "$out" | tr '\n' ' '). Waiting ${WAIT}s (retry $retries)."
+      if [[ -n "$STOP_EPOCH" ]] && (( $(date +%s) + WAIT >= STOP_EPOCH )); then
+        log "  next retry would pass the stop time; stopping."; exit 4
+      fi
       sleep "$WAIT"; continue
     fi
     log "  $label ended without a RALPH_ status line (rc=$rc)."
@@ -83,9 +100,10 @@ bump_idle() {
 }
 
 tasks=0; idle=0
-log "start: tasks<=$MAX_TASKS planner=$P_MODEL/$P_EFFORT exec=$E_MODEL/$E_EFFORT review=$R_MODEL/$R_EFFORT rounds=$MAX_ROUNDS"
+log "start: last_task_at=${RALPH_LAST_TASK_AT:-none} stop_at=${RALPH_STOP_AT:-none} tasks<=$MAX_TASKS planner=$P_MODEL/$P_EFFORT exec=$E_MODEL/$E_EFFORT review=$R_MODEL/$R_EFFORT rounds=$MAX_ROUNDS"
 
 while (( tasks < MAX_TASKS )); do
+  if past "$LAST_TASK_EPOCH"; then log "last-task time reached; stopping cleanly."; exit 0; fi
   tasks=$((tasks + 1)); stamp=$(date +%m%d-%H%M%S)
   head_before=$(git rev-parse HEAD)
   rm -f "$STATE/brief.md" "$STATE/review.md"
