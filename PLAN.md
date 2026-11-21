@@ -176,7 +176,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - `uv run pytest -q` passes;
   - `uv lock --check` passes.
 
-- [ ] T-0.3 Test harness and architecture fitness functions
+- [x] T-0.3 Test harness and architecture fitness functions
 - Files: `tests/conftest.py`, `tests/support/__init__.py`, `tests/support/fake_bin.py`, `tests/arch/test_restricted_imports.py`, `tests/arch/rules.py`, `tools/coverage_gate.py`, `tests/unit/test_coverage_gate.py`, `tests/unit/test_harness.py`, Makefile `check`.
 - Refs: TEST-STRATEGY §2 (architectural tests), §5, D-002, D-018, D-019.
 - Steps:

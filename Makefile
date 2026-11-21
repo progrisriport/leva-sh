@@ -2,6 +2,7 @@
 
 UV ?= uv
 PYTEST_COV := $(UV) run pytest --cov --cov-report=term-missing:skip-covered --cov-report=json
+COVERAGE_GATE := $(UV) run python tools/coverage_gate.py coverage.json
 VERIFY_HOME := $(CURDIR)/.cache/leva
 
 .DEFAULT_GOAL := check
@@ -14,6 +15,7 @@ check:
 	$(UV) run mypy
 	$(UV) run lint-imports
 	$(PYTEST_COV)
+	$(COVERAGE_GATE)
 
 lint:
 	$(UV) run ruff check .
@@ -32,6 +34,7 @@ test:
 
 cov:
 	$(PYTEST_COV)
+	$(COVERAGE_GATE)
 
 live:
 	$(UV) run pytest -m macos_live

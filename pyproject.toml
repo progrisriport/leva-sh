@@ -83,6 +83,8 @@ max-complexity = 10
 [tool.ruff.lint.isort]
 # CLAUDE.md: every module starts with this import (docstring-only modules are exempt).
 required-imports = ["from __future__ import annotations"]
+# The repo root is not a ruff src root, so name the top-level test and tool packages here.
+known-first-party = ["tests", "tools"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "D", "ARG"]
@@ -126,7 +128,11 @@ timeout = 60
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
 xfail_strict = true
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    # pytest-socket warns right before raising SocketBlockedError; the error is what fails the test.
+    "ignore:A test tried to use socket:UserWarning:pytest_socket",
+]
 
 [tool.coverage.run]
 branch = true

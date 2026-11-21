@@ -95,4 +95,9 @@ Rules for editing this file:
 
 ## Later decisions
 
-(None yet. Append `D-025` onwards here.)
+- **D-025 Arch rule scope (2026-11-21).** Reason: the D-002 stdlib restrictions name modules, but the same capability is reachable through neighbouring names; the AST checker in `tests/arch/rules.py` closes those gaps. It resolves every import, every dotted attribute chain rooted at an imported name, and every builtin reference to a qualified name, then:
+  - `subprocess` also covers `asyncio.subprocess`, `asyncio.create_subprocess_exec` and `asyncio.create_subprocess_shell` (`os.system`/`os.popen`/`os.spawn*` are already rejected by ruff `S605`/`S606`);
+  - the environment rule also covers `os.environb`, `os.getenvb` and `os.unsetenv`;
+  - the print rule flags any reference to the builtin `print` (also `builtins.print`), not only calls;
+  - the private-import rule flags any `leva.X.<..._private...>` path used outside `leva.X`, including private attributes reached through an imported name (`Store._cache`) and relative imports. Dunder names (`__main__`, `__version__`) are not private.
+- **D-026 Coverage gate details (2026-11-21).** Reason: D-019 leaves the arithmetic and edge cases open. `tools/coverage_gate.py` computes coverage as coverage.py does with branch coverage, (covered lines + covered branches) / (statements + branches), summed per top-level package; compares exactly (no rounding) and displays rounded down; gates the root `leva/__init__.py` as package `leva` at 85%; gates `overall` at 85% over all packages with statements; exits 2 when the report is unreadable, lacks branch data or has malformed summaries.
