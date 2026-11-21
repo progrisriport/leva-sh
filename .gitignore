@@ -32,3 +32,6 @@ spikes/out/
 .ralph/ralph.log
 .claude/ralph-loop.local.md
 .ralph/LOCK
+.ralph/brief.md
+.ralph/review.md
+.ralph/DONE
