@@ -1,0 +1,484 @@
+<title>Leva TUI Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600&display=swap">
+<style>
+/* Layout: a simulated macOS terminal window holding the Leva TUI (launcher + card), controls above it. Single dark look on purpose: it mirrors a terminal. */
+:root {
+  color-scheme: dark;
+  --page: #121212;          /* page around the window */
+  --term: #0d0d0d;          /* terminal background (in the real app: transparent, user's own) */
+  --chrome: #1c1c1c;        /* window title bar */
+  --accent: #E8B84B;        /* design system: primary accent */
+  --text: #D4D4D4;          /* design system: normal text */
+  --muted: #7A7A7A;         /* design system: secondary text */
+  --border: #3A3A3A;        /* design system: borders */
+  --ok: #4BE87A;            /* design system: success */
+  --err: #E85B4B;           /* design system: error */
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Monaco, monospace;
+  --sans: "Inter", -apple-system, "Helvetica Neue", Arial, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--page); color: var(--text); font-family: var(--sans);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.intro { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: baseline; justify-content: space-between; }
+.intro h1 { font-family: var(--mono); font-size: 18px; margin: 0; color: var(--accent); letter-spacing: .02em; }
+.intro p { margin: 0; color: var(--muted); font-size: 13px; max-width: 70ch; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; }
+.controls button {
+  font: 12px var(--mono); color: var(--text); background: transparent; border: 1px solid var(--border);
+  padding: 6px 10px; cursor: pointer; border-radius: 0;
+}
+.controls button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.controls button:focus-visible, .tui :focus-visible { outline: 1px solid var(--accent); outline-offset: 1px; }
+
+.window { border: 1px solid #2a2a2a; background: var(--term); overflow-x: auto; }
+.titlebar { background: var(--chrome); display: flex; align-items: center; gap: 8px; padding: 7px 12px; font: 12px var(--sans); color: var(--muted); min-width: max-content; }
+.dot { width: 11px; height: 11px; border-radius: 50%; background: #3a3a3a; }
+.titlebar span.t { margin-left: 10px; }
+
+/* TUI */
+.tui { font: 13px/1.45 var(--mono); color: var(--text); padding: 10px 12px 6px; display: flex; flex-direction: column; gap: 6px; height: 640px; }
+.tui.wide { width: 1100px; }
+.tui.narrow { width: 560px; }
+.box { position: relative; border: 1px solid var(--border); padding: 10px 10px 8px; min-width: 0; }
+.box > .bt { position: absolute; top: -0.75em; left: 10px; background: var(--term); padding: 0 6px; color: var(--accent); }
+.box > .br { position: absolute; top: -0.75em; right: 10px; background: var(--term); padding: 0 6px; color: var(--muted); }
+.hdr .name { color: var(--accent); font-weight: 700; }
+.hdr .tag { color: var(--muted); }
+.body { flex: 1; display: grid; gap: 10px 8px; min-height: 0; }
+.wide .body { grid-template-columns: 38ch 1fr; }
+.narrow .body { grid-template-columns: 1fr; }
+.col { display: flex; flex-direction: column; gap: 10px; min-height: 0; }
+.search input {
+  width: 100%; background: transparent; border: 0; color: var(--text); font: inherit; outline: none; caret-color: var(--accent);
+}
+.search input::placeholder { color: var(--muted); }
+.results, .card { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+.scroll { flex: 1; overflow: auto; min-height: 0; }
+.hdr { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0 16px; }
+.hdr .tag { white-space: nowrap; }
+.row { display: grid; grid-template-columns: 2ch 9ch 1fr auto; gap: 0 4px; cursor: pointer; padding: 1px 0; }
+.row .mk { color: var(--accent); }
+.row .sum { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.row .badge { color: var(--muted); }
+.row.sel .nm { font-weight: 700; color: var(--text); }
+.row .via { grid-column: 3 / 5; color: var(--muted); font-size: 12px; }
+.empty { color: var(--muted); }
+.tabs { display: flex; flex-wrap: wrap; gap: 0 14px; margin-bottom: 10px; color: var(--muted); }
+.tabs button { background: none; border: 0; padding: 0; font: inherit; color: var(--muted); cursor: pointer; }
+.tabs button.on { color: var(--accent); font-weight: 700; }
+.lead { margin: 0 0 10px; }
+.explain { color: var(--text); margin: 0 0 12px; max-width: 72ch; }
+.ex { display: grid; grid-template-columns: 2ch 3ch 1fr; padding: 3px 0; cursor: pointer; }
+.ex .mk { color: var(--accent); }
+.ex .n { color: var(--muted); }
+.ex .d { color: var(--text); }
+.ex.sel .d { font-weight: 700; }
+.ex .c { grid-column: 3; color: var(--text); white-space: pre-wrap; }
+.ph { color: var(--accent); }
+.ex .danger { grid-column: 3; color: var(--accent); }
+.ex .src { color: var(--muted); }
+.note { display: grid; grid-template-columns: 9ch 1fr; margin: 4px 0; }
+.note .k { color: var(--muted); }
+.note.safety .k { color: var(--accent); }
+.rel { margin-top: 10px; color: var(--muted); }
+.rel a { color: var(--text); text-decoration: none; cursor: pointer; }
+.rel a:hover { color: var(--accent); }
+.sub { display: grid; grid-template-columns: 14ch 1fr; padding: 1px 0; cursor: pointer; }
+.sub .s { color: var(--muted); }
+.man { white-space: pre-wrap; color: var(--text); }
+.man b { color: var(--text); }
+.status { min-height: 1.45em; }
+.status.ok { color: var(--ok); }
+.status.warn { color: var(--accent); }
+.status.err { color: var(--err); }
+.sep { border-top: 1px solid var(--border); }
+.foot { color: var(--muted); display: flex; flex-wrap: wrap; gap: 0 18px; padding-top: 4px; }
+.foot b { color: var(--muted); font-weight: 400; }
+.ingest .bar { color: var(--accent); }
+.ingest .bar .rest { color: var(--border); }
+.ingest .m { color: var(--muted); }
+.hidden { display: none !important; }
+.help { columns: 2; column-gap: 40px; }
+.help div { break-inside: avoid; margin-bottom: 10px; }
+.help .h { color: var(--accent); }
+.help .k { display: inline-block; width: 11ch; color: var(--text); }
+.help .a { color: var(--muted); }
+.note-box { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.note-box code { font-family: var(--mono); color: var(--text); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <h1>leva · TUI demo</h1>
+    <p>Interactive mockup of the v1 screens: type a command or what you want to do, move with ↑↓, press <code>c</code> or click an example to copy. Sample data, 12 commands.</p>
+  </div>
+  <div class="controls" role="group" aria-label="Demo controls">
+    <button id="btn-wide" aria-pressed="true">Wide pane · 100+ cols</button>
+    <button id="btn-narrow" aria-pressed="false">Split pane · 60–99 cols</button>
+    <button id="btn-ingest">Simulate first run</button>
+    <button id="btn-help">Help overlay (?)</button>
+  </div>
+
+  <div class="window">
+    <div class="titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="t">leva — zsh — 110×34</span></div>
+    <div class="tui wide" id="tui" tabindex="-1">
+      <div class="box hdr"><span class="bt">Leva</span><span class="br" id="crumb">search</span>
+        <span class="tag">Less effort, more thought.</span><span class="tag">macOS 27.2 · 2598 entries</span>
+      </div>
+
+      <!-- main -->
+      <div class="body" id="main">
+        <div class="col" id="left">
+          <div class="box search"><span class="bt">Search</span>
+            <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="type a command or what you want to do" aria-label="Search commands">
+          </div>
+          <div class="box results" id="resbox"><span class="bt" id="restitle">Recent</span><div class="scroll" id="results"></div></div>
+        </div>
+        <div class="box card" id="card"><span class="bt" id="cardtitle">Start here</span><span class="br" id="cardbadge"></span><div class="scroll" id="cardbody"></div></div>
+      </div>
+
+      <!-- ingest -->
+      <div class="box ingest hidden" id="ingest" style="flex:1"><span class="bt">Index</span><div id="ingestbody"></div></div>
+      <!-- help -->
+      <div class="box hidden" id="helpbox" style="flex:1"><span class="bt">Keys</span>
+        <div class="help">
+          <div><div class="h">Global</div>
+            <div><span class="k">/</span><span class="a">focus search</span></div>
+            <div><span class="k">?</span><span class="a">this help</span></div>
+            <div><span class="k">Esc</span><span class="a">back / close</span></div>
+            <div><span class="k">a</span><span class="a">about &amp; licences</span></div>
+            <div><span class="k">q</span><span class="a">quit</span></div></div>
+          <div><div class="h">Search</div>
+            <div><span class="k">↑ ↓</span><span class="a">move in results</span></div>
+            <div><span class="k">Enter</span><span class="a">open card</span></div>
+            <div><span class="k">Tab</span><span class="a">focus card</span></div></div>
+          <div><div class="h">Card</div>
+            <div><span class="k">1–5 ← →</span><span class="a">switch tab</span></div>
+            <div><span class="k">↑ ↓</span><span class="a">select example</span></div>
+            <div><span class="k">c / click</span><span class="a">copy example</span></div>
+            <div><span class="k">m</span><span class="a">manual tab</span></div>
+            <div><span class="k">Backspace</span><span class="a">history back</span></div></div>
+          <div><div class="h">Manual</div>
+            <div><span class="k">/</span><span class="a">find in page</span></div>
+            <div><span class="k">[ ]</span><span class="a">previous / next section</span></div></div>
+        </div>
+      </div>
+
+      <div class="status" id="status" aria-live="polite"></div>
+      <div class="sep"></div>
+      <div class="foot" id="foot"></div>
+    </div>
+  </div>
+
+  <div class="note-box">
+    Browser approximation of the terminal app: borders are CSS lines instead of box-drawing glyphs, and the real app keeps your terminal's own background. Copy strips the placeholder markers, so <code>&lt;folder&gt;</code> is copied as <code>folder</code>. Manual excerpts here are short paraphrases; the app renders the man page installed on your Mac.
+  </div>
+</div>
+
+<script>
+const DATA = [
+  { name:"tar", badge:"[curated]", summary:"create, list, extract archives",
+    intents:["compress a folder","make an archive","extract archive","unpack tar.gz","zip a directory"],
+    lead:"Create, list and extract archives (.tar, .tar.gz, .tgz).",
+    explain:"tar bundles files and folders into one archive and can compress it with gzip (-z). On macOS tar is bsdtar, which also reads zip and many other formats. The same letters are used in every mode: c create, x extract, t list, f the archive file.",
+    examples:[
+      {d:"Compress a folder into .tar.gz", c:"tar -czf {{archive}}.tar.gz {{folder}}"},
+      {d:"Extract an archive into the current folder", c:"tar -xzf {{archive}}.tar.gz"},
+      {d:"List the contents without extracting", c:"tar -tzf {{archive}}.tar.gz"},
+      {d:"Extract into a specific folder", c:"tar -xzf {{archive}}.tar.gz -C {{target}}"},
+      {d:"Archive a folder but skip .git", c:"tar -czf {{archive}}.tar.gz --exclude .git {{folder}}", src:"[tldr]"}],
+    notes:[{k:"[bsd]",t:"macOS tar is bsdtar: put --exclude before the paths, not after."},{k:"[macos]",t:"Use ditto -c -k --keepParent to make Finder-style zip files with metadata."}],
+    related:["zip","ditto","gzip","hdiutil"],
+    man:"NAME\n     tar — manipulate tape archives\n\nSYNOPSIS\n     tar {-c} [options] [files | directories]\n     tar {-r | -u} -f archive-file [options] [files | directories]\n     tar {-t | -x} [options] [patterns]\n\nDESCRIPTION\n     (rendered from your local man page)" },
+  { name:"zip", badge:"", summary:"package and compress files",
+    intents:["compress a folder","zip a directory","make a zip file"],
+    lead:"Package and compress files into a .zip archive.",
+    explain:"zip creates archives that open everywhere, including Windows. Use -r to include folders recursively.",
+    examples:[{d:"Zip a folder recursively", c:"zip -r {{archive}}.zip {{folder}}"},{d:"Zip a folder but skip .DS_Store files", c:"zip -r {{archive}}.zip {{folder}} -x '*.DS_Store'"}],
+    notes:[{k:"[macos]",t:"Finder's Compress adds __MACOSX metadata; zip from the shell does not."}],
+    related:["unzip","tar","ditto"], man:"NAME\n     zip — package and compress (archive) files\n\nSYNOPSIS\n     zip [-options] [zipfile [file ...]]" },
+  { name:"ditto", badge:"[macos]", summary:"copy, keep macOS metadata",
+    intents:["compress a folder","copy keeping permissions","make a zip like finder"],
+    lead:"Copy files and folders, keeping macOS metadata.",
+    explain:"ditto copies like cp -R but preserves extended attributes, resource forks and permissions. With -c -k it writes zip archives the way Finder does.",
+    examples:[{d:"Make a Finder-style zip of a folder", c:"ditto -c -k --keepParent {{folder}} {{archive}}.zip"},{d:"Copy a folder with all metadata", c:"ditto {{source}} {{destination}}"}],
+    notes:[], related:["cp","tar","zip"], man:"NAME\n     ditto — copy directory hierarchies, create and extract archives" },
+  { name:"gzip", badge:"", summary:"compress single files",
+    intents:["compress a file","gz a file"],
+    lead:"Compress or decompress single files (.gz).", explain:"gzip replaces the file with a compressed .gz version. It works on single files; use tar to combine several files first.",
+    examples:[{d:"Compress a file (replaces it)", c:"gzip {{file}}"},{d:"Keep the original file", c:"gzip -k {{file}}"},{d:"Decompress", c:"gunzip {{file}}.gz"}],
+    notes:[], related:["gunzip","tar","xz"], man:"NAME\n     gzip — compression/decompression tool" },
+  { name:"hdiutil", badge:"[macos]", summary:"create and mount disk images",
+    intents:["make a dmg","mount a disk image","compress a folder"],
+    lead:"Create, mount and convert disk images (.dmg).", explain:"hdiutil works with macOS disk images. Use it to package an app or folder as a .dmg.",
+    examples:[{d:"Make a compressed .dmg from a folder", c:"hdiutil create -srcfolder {{folder}} -format UDZO {{image}}.dmg"},{d:"Mount a disk image", c:"hdiutil attach {{image}}.dmg"}],
+    notes:[], related:["diskutil","ditto"], man:"NAME\n     hdiutil — manipulate disk images" },
+  { name:"rm", badge:"[curated]", summary:"remove files and folders",
+    intents:["delete a file","delete a folder","remove directory"],
+    lead:"Remove files and folders.", explain:"rm deletes files immediately: they do not go to the Trash. Use -r for folders and -i to be asked before each deletion.",
+    examples:[
+      {d:"Delete a file", c:"rm {{file}}"},
+      {d:"Ask before each deletion", c:"rm -i {{file}}"},
+      {d:"Delete a folder and everything in it", c:"rm -rf {{folder}}", danger:"deletes permanently, no Trash, no undo"}],
+    notes:[{k:"[danger]",t:"There is no undo. Check the path with ls first.", safety:true},{k:"[macos]",t:"To move to the Trash instead, use: trash (macOS 15+) or Finder."}],
+    related:["rmdir","mv","trash"], man:"NAME\n     rm, unlink — remove directory entries" },
+  { name:"mkdir", badge:"[curated]", summary:"create folders",
+    intents:["create a folder","make a directory","new folder"],
+    lead:"Create folders.", explain:"mkdir creates a new directory. With -p it also creates missing parent folders and does not complain if the folder exists.",
+    examples:[{d:"Create a folder", c:"mkdir {{folder}}"},{d:"Create nested folders at once", c:"mkdir -p {{parent}}/{{child}}/{{grandchild}}"}],
+    notes:[], related:["rmdir","cd","ls"], man:"NAME\n     mkdir — make directories" },
+  { name:"mv", badge:"[curated]", summary:"move or rename files",
+    intents:["move a folder","rename a file","move a file"],
+    lead:"Move or rename files and folders.", explain:"mv moves a file or folder to a new place, or renames it if the destination is in the same folder. It overwrites existing files without asking unless you add -i.",
+    examples:[{d:"Rename a file", c:"mv {{old_name}} {{new_name}}"},{d:"Move a folder into another folder", c:"mv {{folder}} {{destination}}/"},{d:"Ask before overwriting", c:"mv -i {{source}} {{destination}}"}],
+    notes:[{k:"[safety]",t:"Without -i, an existing destination file is replaced silently.", safety:true}],
+    related:["cp","rm","ditto"], man:"NAME\n     mv — move files" },
+  { name:"find", badge:"[curated]", summary:"search files by name, size, date",
+    intents:["find a file","search files by name","find large files"],
+    lead:"Search for files by name, type, size or date.", explain:"find walks a folder tree and prints every path that matches your tests. The first argument is where to start; '.' means here.",
+    examples:[{d:"Find files by name (case-insensitive)", c:"find {{folder}} -iname '*{{name}}*'"},{d:"Find files larger than 100 MB", c:"find {{folder}} -type f -size +100M"}],
+    notes:[{k:"[bsd]",t:"BSD find needs a starting path: find . -name x, not find -name x."},{k:"[macos]",t:"For instant search of indexed files, mdfind uses Spotlight."}],
+    related:["mdfind","grep","ls"], man:"NAME\n     find — walk a file hierarchy" },
+  { name:"grep", badge:"[curated]", summary:"find text inside files",
+    intents:["find text in files","search inside files","search a word"],
+    lead:"Search for text inside files.", explain:"grep prints the lines that match a pattern. Use -r to search a whole folder and -n to show line numbers.",
+    examples:[{d:"Search a word in all files of a folder", c:"grep -rn '{{text}}' {{folder}}"},{d:"Case-insensitive search", c:"grep -i '{{text}}' {{file}}"}],
+    notes:[{k:"[bsd]",t:"macOS grep has no -P (Perl regex). Use -E for extended regex."}],
+    related:["find","sed","awk"], man:"NAME\n     grep, egrep, fgrep — file pattern searcher" },
+  { name:"clang", badge:"[curated]", summary:"compile C programs",
+    intents:["compile a c program","run a c file","build c"],
+    lead:"Compile C, C++ and Objective-C programs.", explain:"clang is the C compiler that ships with Xcode Command Line Tools. Compile with -o to name the program, then run it with ./name.",
+    examples:[{d:"Compile a C file", c:"clang {{hello}}.c -o {{hello}}"},{d:"Compile with warnings, then run", c:"clang -Wall -Wextra {{hello}}.c -o {{hello}} && ./{{hello}}"}],
+    notes:[{k:"[macos]",t:"If clang is missing, install the tools with: xcode-select --install"},{k:"[macos]",t:"gcc on macOS is an alias for clang."}],
+    related:["make","cc","lldb"], man:"NAME\n     clang — the Clang C, C++, and Objective-C compiler" },
+  { name:"git", badge:"[curated]", summary:"version control",
+    intents:["save changes","undo changes","version control"],
+    lead:"Track changes in a project.", explain:"git records snapshots of a folder so you can go back, compare and share. Most work uses status, add, commit, log and push.",
+    examples:[{d:"See what changed", c:"git status"},{d:"Save all changes as a commit", c:"git add -A && git commit -m '{{message}}'"}],
+    notes:[], related:["gh","diff"],
+    subs:[["git status","show the working tree status"],["git add","stage changes"],["git commit","record a snapshot"],["git log","show history"],["git push","send commits to a remote"],["git restore","discard changes in files"]],
+    man:"NAME\n     git — the stupid content tracker" },
+];
+const MAN_ONLY = [{name:"compress", summary:"compress data (legacy .Z format)", badge:"(man)"}];
+
+const $ = id => document.getElementById(id);
+const tui = $("tui"), q = $("q");
+const state = { results: [], sel: 0, open: null, tab: 1, ex: 0, focus: "search", history: [], recent: ["tar","git"], mode: "main" };
+
+function esc(s){ return s.replace(/[&<>]/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[ch])); }
+function showCmd(c){ return esc(c).replace(/\{\{(\w+)\}\}/g, '<span class="ph">&lt;$1&gt;</span>'); }
+function plain(c){ return c.replace(/\{\{(\w+)\}\}/g, "$1"); }
+function byName(n){ return DATA.find(d => d.name === n); }
+
+function search(text){
+  const t = text.trim().toLowerCase();
+  if (!t) return [];
+  const out = [];
+  for (const d of DATA){
+    let score = 0, via = null;
+    if (d.name === t) score = 100;
+    else if (d.name.startsWith(t)) score = 80;
+    const idx = d.intents.findIndex(i => i.includes(t) || t.split(/\s+/).every(w => i.includes(w)));
+    if (idx >= 0 && score < 60){
+      // intent signal: exact phrase > partial, earlier (primary) intents rank higher, curated cards win ties
+      const hit = d.intents[idx];
+      score = (hit === t ? 70 : 60) - idx * 2 + (d.badge === "[curated]" ? 1 : 0);
+      via = hit;
+    }
+    else if (!score && d.summary.includes(t)) score = 40;
+    if (score) out.push({d, score, via});
+  }
+  for (const m of MAN_ONLY) if (m.name.includes(t) || t.split(/\s+/).some(w => w.length > 3 && m.name.startsWith(w.slice(0,5)))) out.push({d:m, score:10, via:null});
+  return out.sort((a,b) => b.score - a.score || a.d.name.localeCompare(b.d.name));
+}
+
+function renderResults(){
+  const box = $("results");
+  const t = q.value.trim();
+  if (!t){
+    $("restitle").textContent = "Recent";
+    box.innerHTML = state.recent.map((n,i) => { const d = byName(n);
+      return `<div class="row${i===state.sel && state.focus==='search'?' sel':''}" data-name="${n}"><span class="mk">${i===state.sel && state.focus==='search'?'>':' '}</span><span class="nm">${n}</span><span class="sum">${esc(d.summary)}</span><span class="badge"></span></div>`; }).join("");
+    state.results = state.recent.map(n => ({d:byName(n)}));
+  } else {
+    state.results = search(t);
+    $("restitle").textContent = `Results  ${state.results.length}`;
+    if (!state.results.length){
+      box.innerHTML = `<div class="empty">No match for "${esc(t)}".<br>Try fewer words, or a command name.</div>`;
+    } else {
+      box.innerHTML = state.results.map((r,i) => {
+        const s = i === state.sel;
+        return `<div class="row${s?' sel':''}" data-name="${r.d.name}"><span class="mk">${s?'>':' '}</span><span class="nm">${r.d.name}</span><span class="sum">${esc(r.d.summary)}</span><span class="badge">${r.d.badge||''}</span>${r.via?`<span class="via">via: ${esc(r.via)}</span>`:''}</div>`;
+      }).join("");
+    }
+  }
+  box.querySelectorAll(".row").forEach((el,i) => {
+    el.addEventListener("click", () => { state.sel = i; state.history = []; openCard(el.dataset.name, false); });
+  });
+}
+
+function startHere(){
+  $("cardtitle").textContent = "Start here"; $("cardbadge").textContent = "";
+  const tries = ["compress a folder","find text in files","create a folder","compile a c program"];
+  $("cardbody").innerHTML = `<div class="lead">Try:</div>` + tries.map(t => `<div class="rel"><a data-try="${t}">› ${t}</a></div>`).join("") +
+    `<div class="rel" style="margin-top:18px">Badges:</div>
+     <div class="note"><span class="k">[curated]</span><span>hand-written card with verified examples</span></div>
+     <div class="note"><span class="k">[macos]</span><span>macOS-only command</span></div>
+     <div class="note"><span class="k">(man)</span><span>from your local manual only</span></div>`;
+  $("cardbody").querySelectorAll("[data-try]").forEach(a => a.addEventListener("click", () => { q.value = a.dataset.try; state.sel = 0; refresh(); q.focus(); }));
+}
+
+function openCard(name, push){
+  const d = byName(name);
+  if (!d){ status(`"${name}" has no curated card in this demo`, "warn"); return; }
+  if (push && state.open && state.open !== name) state.history.push(state.open);
+  state.open = name; state.tab = 1; state.ex = 0;
+  if (!state.recent.includes(name)) state.recent.unshift(name);
+  if (tui.classList.contains("narrow")) { state.focus = "card"; }
+  refresh();
+}
+
+function examplesFor(d, all){ return all ? d.examples : d.examples.slice(0,3); }
+
+function renderCard(){
+  if (!state.open){ startHere(); return; }
+  const d = byName(state.open);
+  $("cardtitle").textContent = d.name; $("cardbadge").textContent = d.badge || "";
+  const tabs = ["Overview","Examples", d.subs ? "Subcmds" : "Subcmds", "Related","Manual"];
+  let html = `<div class="tabs" role="tablist">${tabs.map((t,i)=>`<button role="tab" data-tab="${i+1}" class="${state.tab===i+1?'on':''}">${i+1} ${t}</button>`).join("")}</div>`;
+  if (state.tab === 1 || state.tab === 2){
+    const exs = examplesFor(d, state.tab === 2);
+    if (state.tab === 1) html += `<p class="lead">${esc(d.lead)}</p><p class="explain">${esc(d.explain)}</p>`;
+    html += exs.map((e,i) => { const s = state.focus==='card' && i===state.ex;
+      return `<div class="ex${s?' sel':''}" data-ex="${i}"><span class="mk">${s?'>':' '}</span><span class="n">${i+1}</span><span class="d">${esc(e.d)} ${e.src?`<span class="src">${e.src}</span>`:''}</span><span class="c">${showCmd(e.c)}</span>${e.danger?`<span class="danger">[danger] ${esc(e.danger)}</span>`:''}</div>`; }).join("");
+    if (state.tab === 1){
+      html += `<div style="margin-top:10px">` + d.notes.map(n => `<div class="note${n.safety?' safety':''}"><span class="k">${n.k}</span><span>${esc(n.t)}</span></div>`).join("") + `</div>`;
+      html += `<div class="rel">Related: ${d.related.map(r=>`<a data-rel="${r}">${r}</a>`).join(" · ")}</div>`;
+    }
+  } else if (state.tab === 3){
+    html += d.subs ? d.subs.map(s => `<div class="sub"><span>${s[0]}</span><span class="s">${esc(s[1])}</span></div>`).join("") : `<div class="empty">No subcommands.</div>`;
+  } else if (state.tab === 4){
+    html += d.related.map(r => `<div class="sub" data-rel="${r}"><span>${r}</span><span class="s">${byName(r)?esc(byName(r).summary):'(man)'}</span></div>`).join("");
+  } else {
+    html += `<div class="man">${esc(d.man)}</div>`;
+  }
+  $("cardbody").innerHTML = html;
+  $("cardbody").querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => { state.tab = +b.dataset.tab; state.ex = 0; refresh(); }));
+  $("cardbody").querySelectorAll("[data-ex]").forEach(el => el.addEventListener("click", () => { state.focus = "card"; state.ex = +el.dataset.ex; copy(); refresh(); }));
+  $("cardbody").querySelectorAll("[data-rel]").forEach(el => el.addEventListener("click", () => openCard(el.dataset.rel, true)));
+}
+
+let stTimer;
+function status(msg, kind){ const s = $("status"); s.className = "status " + kind; s.textContent = msg; clearTimeout(stTimer); stTimer = setTimeout(() => { s.textContent = ""; }, 3000); }
+
+function copy(){
+  const d = byName(state.open); if (!d) return;
+  const e = examplesFor(d, state.tab === 2)[state.ex]; if (!e) return;
+  const text = plain(e.c);
+  const done = () => status(e.danger ? `copied (danger): ${text}` : `copied: ${text}`, e.danger ? "warn" : "ok");
+  try { navigator.clipboard.writeText(text).then(done, done); } catch { done(); }
+}
+
+function renderFoot(){
+  let keys;
+  if (state.mode === "ingest") keys = ["Ctrl+C cancel"];
+  else if (state.mode === "help") keys = ["Esc close"];
+  else if (state.focus === "card") keys = ["↑↓ example","c copy","1–5 tab","m manual","Esc back","? help","q quit"];
+  else keys = ["/ search","↑↓ move","Enter open", tui.classList.contains("wide") ? "Tab card" : "", "? help","a about","q quit"].filter(Boolean);
+  $("foot").innerHTML = keys.map(k => `<b>${k}</b>`).join("");
+}
+
+function crumb(){ $("crumb").textContent = ["search", ...state.history, state.open].filter(Boolean).join(" › "); }
+
+function refresh(){
+  const narrow = tui.classList.contains("narrow");
+  if (narrow){
+    $("left").classList.toggle("hidden", state.focus === "card" && !!state.open);
+    $("card").classList.toggle("hidden", !(state.focus === "card" && state.open));
+  } else { $("left").classList.remove("hidden"); $("card").classList.remove("hidden"); }
+  renderResults();
+  if (!narrow && q.value.trim() && state.results[state.sel] && byName(state.results[state.sel].d.name) && state.focus === "search"){
+    if (state.open !== state.results[state.sel].d.name){ state.open = state.results[state.sel].d.name; state.history = []; state.tab = 1; state.ex = 0; }
+  }
+  renderCard(); renderFoot(); crumb();
+}
+
+function setWidth(wide){
+  tui.classList.toggle("wide", wide); tui.classList.toggle("narrow", !wide);
+  $("btn-wide").setAttribute("aria-pressed", wide); $("btn-narrow").setAttribute("aria-pressed", !wide);
+  state.focus = "search"; refresh(); q.focus();
+}
+
+function showMode(mode){
+  state.mode = mode;
+  $("main").classList.toggle("hidden", mode !== "main");
+  $("ingest").classList.toggle("hidden", mode !== "ingest");
+  $("helpbox").classList.toggle("hidden", mode !== "help");
+  renderFoot();
+}
+
+let ingTimer;
+function runIngest(){
+  showMode("ingest"); clearInterval(ingTimer);
+  const total = 2598; let done = 0;
+  const draw = () => {
+    const pct = Math.min(100, Math.round(done / total * 100)); const w = 24, f = Math.round(pct / 100 * w);
+    $("ingestbody").innerHTML = `<div>Building your local index (first run only)</div><br>
+      <div>Reading man pages   ${String(Math.min(done,total)).padStart(4)} / ${total}   <span class="bar">${"█".repeat(f)}<span class="rest">${"░".repeat(w-f)}</span></span>  ${pct}%</div>
+      <div>Executables         1312 found</div><div>Curated cards        152 ready</div><br>
+      <div class="m">Everything stays on this Mac. This takes about 5 s.</div>`;
+  };
+  draw();
+  ingTimer = setInterval(() => { done += 130; draw(); if (done >= total){ clearInterval(ingTimer); setTimeout(() => { showMode("main"); status("index ready: 2598 entries", "ok"); q.focus(); }, 500); } }, 200);
+}
+
+q.addEventListener("input", () => { state.sel = 0; state.focus = "search"; refresh(); });
+q.addEventListener("focus", () => { if (state.focus !== "search"){ state.focus = "search"; refresh(); } });
+
+document.addEventListener("keydown", e => {
+  if (state.mode === "help"){ if (e.key === "Escape" || e.key === "?"){ showMode("main"); q.focus(); e.preventDefault(); } return; }
+  if (state.mode === "ingest") return;
+  const inSearch = document.activeElement === q;
+  const n = state.results.length;
+  if (state.focus === "search"){
+    if (e.key === "ArrowDown"){ state.sel = Math.min(n-1, state.sel+1); refresh(); e.preventDefault(); }
+    else if (e.key === "ArrowUp"){ state.sel = Math.max(0, state.sel-1); refresh(); e.preventDefault(); }
+    else if (e.key === "Enter" && n){ state.history = []; openCard(state.results[state.sel].d.name, false); state.focus = "card"; q.blur(); tui.focus(); refresh(); e.preventDefault(); }
+    else if (e.key === "Tab" && state.open){ state.focus = "card"; q.blur(); tui.focus(); refresh(); e.preventDefault(); }
+    else if (e.key === "?" && !inSearch){ showMode("help"); }
+    else if (e.key === "Escape"){ q.value = ""; state.open = null; state.history = []; state.sel = 0; refresh(); }
+    return;
+  }
+  // card focus
+  const d = byName(state.open); const exs = d ? examplesFor(d, state.tab === 2) : [];
+  if (e.key === "ArrowDown"){ state.ex = Math.min(exs.length-1, state.ex+1); refresh(); e.preventDefault(); }
+  else if (e.key === "ArrowUp"){ state.ex = Math.max(0, state.ex-1); refresh(); e.preventDefault(); }
+  else if (e.key === "c" || e.key === "Enter"){ copy(); e.preventDefault(); }
+  else if (/^[1-5]$/.test(e.key)){ state.tab = +e.key; state.ex = 0; refresh(); }
+  else if (e.key === "ArrowRight" || e.key === "l"){ state.tab = Math.min(5, state.tab+1); state.ex = 0; refresh(); }
+  else if (e.key === "ArrowLeft" || e.key === "h"){ state.tab = Math.max(1, state.tab-1); state.ex = 0; refresh(); }
+  else if (e.key === "m"){ state.tab = 5; refresh(); }
+  else if (e.key === "Backspace"){ const prev = state.history.pop(); if (prev){ state.open = prev; state.tab = 1; state.ex = 0; refresh(); } e.preventDefault(); }
+  else if (e.key === "/" ){ state.focus = "search"; q.focus(); q.select(); refresh(); e.preventDefault(); }
+  else if (e.key === "Escape" || e.key === "Tab"){ state.focus = "search"; q.focus(); refresh(); e.preventDefault(); }
+  else if (e.key === "?"){ showMode("help"); }
+});
+
+$("btn-wide").addEventListener("click", () => setWidth(true));
+$("btn-narrow").addEventListener("click", () => setWidth(false));
+$("btn-ingest").addEventListener("click", runIngest);
+$("btn-help").addEventListener("click", () => showMode(state.mode === "help" ? "main" : "help"));
+
+// realistic starting state: a query already typed
+q.value = "compress a folder";
+refresh();
+</script>

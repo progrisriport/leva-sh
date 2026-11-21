@@ -435,7 +435,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-3.1 `leva.content` (A): schema types and validation
 - Files: `src/leva/content/{__init__.py,_schema.py,_validate.py,_policy.py}`, `tests/unit/test_content_validate.py`.
-- Refs: DITS §8; ADR-0004; D-010, D-016.
+- Refs: DITS §8; ADR-0004; D-010, D-016; D-030 (`Example.danger`)
 - Steps:
   - Dataclasses: CuratedCommand, ExampleSpec, VerifySpec, HelpProbe(args, profile), TldrPage, TldrExample; `ContentRecord = CuratedCommand | TldrPage`.
   - `validate_command(data, file) -> CuratedCommand`, strict:
@@ -522,7 +522,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-5.1 `leva.search`: Searcher
 - Files: `src/leva/search/{__init__.py,_ranking.py}`, `tests/unit/test_search.py`, `tests/fixtures/index/gold_mini.json` (30 queries).
-- Refs: DITS §11; ADR-0003; D-010.
+- Refs: DITS §11; ADR-0003; D-010; D-029 (intent ranking + `via`)
 - Steps:
   - `Weights`/`DEFAULT_WEIGHTS`.
   - Candidates: in-memory NameRows loaded once (exact name/alias, prefix, `rapidfuzz.fuzz.WRatio ≥ 80` on names/aliases, intent token match) + FTS hits.
@@ -741,7 +741,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 
 - [ ] T-8.4 SearchScreen and ResultList
 - Files: `src/leva/tui/screens/search.py`, `src/leva/tui/widgets/result_list.py`, `tests/tui/test_search_screen.py`.
-- Refs: ARCHITECTURE §3.2; DITS §14; FR-9–11; D-012.
+- Refs: ARCHITECTURE §3.2; DITS §14; FR-9–11; D-012; UX.md §3.1; D-028, D-029, D-031
 - Steps:
   - Input with debounce (30 ms, injectable).
   - Rows: name, origin/section tag (secondary), summary (secondary); selected row bold+accent.
@@ -751,7 +751,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 
 - [ ] T-8.5 CardView, CardScreen, Overview tab, history
 - Files: `src/leva/tui/widgets/card_view.py`, `src/leva/tui/screens/card.py`, `tests/tui/test_card_screen.py`.
-- Refs: DITS §12, §14; FR-4, FR-15; D-012.
+- Refs: DITS §12, §14; FR-4, FR-15; D-012; UX.md §3.2; D-028
 - Steps:
   - Tabs Overview/Examples/Subcommands/Manual/Related; keys 1–5, h/l, Left/Right, click.
   - Breadcrumb (click goes back); Backspace and Alt+Left go back; forward.
@@ -761,7 +761,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 
 - [ ] T-8.6 Examples tab and copy
 - Files: `src/leva/tui/widgets/example_list.py`, `tests/tui/test_examples_copy.py`.
-- Refs: ARCHITECTURE §3.3; FR-12, FR-7; DITS §14.
+- Refs: ARCHITECTURE §3.3; FR-12, FR-7; DITS §14; UX.md §3.2–3.3; D-030
 - Steps:
   - Curated examples, then tldr under a "from tldr-pages" label (secondary); long commands wrap.
   - `c` or click → `to_plain` → `clipboard.copy` → `copied: <cmd>` in green.
@@ -806,7 +806,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 - [ ] T-8.11 New visual conventions: placeholders and selection marker
 - Blocked-by: U-2
 - Files: `src/leva/tui/_format.py`, `widgets/example_list.py`, `widgets/result_list.py`, `leva.tcss`, snapshots.
-- Refs: ADR-0005 conventions 1–2; FR-14; the updated design system.
+- Refs: ADR-0005 conventions 1–2; FR-14; the updated design system; D-028 (placeholder display `<name>`)
 - Steps:
   - `segments_to_text(segments, selected)`: placeholders in accent; in the selected example, accent + underline.
   - `>` marker in column 0 for the selected row (lists and examples).
@@ -872,7 +872,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 - [ ] T-10.17 Batch 20: dd, hexdump, xxd, od, bc, expr, seq, yes, true, false
 - [ ] T-10.18 Live gold set (50 queries)
 - Files: `tests/live/gold_queries.yaml`, `tests/live/test_gold_set.py`.
-- Refs: PRD §7; TEST-STRATEGY (search live).
+- Refs: PRD §7; TEST-STRATEGY (search live); D-029 (include intent queries)
 - Steps: 50 realistic "forgot the command" queries spread across categories; assert ≥90% in the top 3 on `real_index`. If it fails, tune `Weights` or intents, never the queries; record the tuning in DECISIONS.
 - Accept: `make live`; `make check`.
 - [ ] U-5 [USER] Spot-review 10 random curated cards (`LEVA_HOME=... uv run leva <cmd>`) for accuracy. Non-blocking.
