@@ -31,3 +31,12 @@
 - R10 edits applied to T-2.2, T-2.4, T-2.5, T-2.6, T-6.3 (see the doc's "Impact on plan").
 - Bash `ls`/`uname`/`xcode-select` on system paths are denied in this loop; Glob works on system paths but does not follow Homebrew symlinks. Run system probes through a spike/test script via `uv run`.
 - Raw reports live in gitignored `spikes/out/`. openssl has no man1 page on this Mac (no `.1ssl` files).
+
+## 2026-11-22T01:00:00Z T-0.5 Spike S-3: FTS5 availability and index size — DONE
+- `spikes/s3_probe.py` (stdlib, Python 3.9 compatible, 9 required + 7 informational checks) and `spikes/s3_fts5.py` (`--quick`, `--json`, `--repeat`); findings in `docs/design/leva-sh/spikes/S-3-fts5.md`.
+- Interpreters: project 3.13.12/SQLite 3.50.4, `/usr/local/bin/python3` 3.12.2/3.45.1 (no dbstat), `/usr/bin/python3` 3.9.6/3.54.0; no Homebrew Python. All required checks ok everywhere.
+- Prototype index of 2598 pages: 41.05 MB after VACUUM (45.51 MB after optimize+ANALYZE); 76% is `doc_section`. Build ~3.8 s (render 3.06 s). FTS p95 0.23 ms, ro open + first query 0.3 ms.
+- D-006 amended: finalize inserts FTS rows itself (`'rebuild'` is rejected on contentless tables; overrides DITS §9 "FTS rebuild"), then `'optimize'`; `open_readonly` uses `Path.as_uri() + "?mode=ro"` and runs `PRAGMA user_version` before returning (garbage files fail only at the first query).
+- D-032 new: no LIKE fallback in v1 (changes ANALYSIS R-11); without FTS5 the build fails with IngestError and doctor names it.
+- Warnings: bm25 alone ranks `ls` 4th and `tar` 2nd (unicode61 splits `git-ls-tree`): T-5.1's name stage must fix it. Unquoted `name:x` silently becomes a column filter: T-4.4 must quote every token and double embedded `"`.
+- Reviewer fixes: probe quoting check extended (`AND`, `:`, `*`, `""`), `--repeat` < 1 rejected, D-006 no longer requires optimize after the commit.

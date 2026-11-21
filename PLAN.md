@@ -215,7 +215,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - the doc has the sections Method, Environment, Samples, Benchmark, Findings, Decisions, Impact on plan, and the 8-worker timing;
   - `uv run ruff check spikes` passes.
 
-- [ ] T-0.5 Spike S-3: FTS5 availability and index size
+- [x] T-0.5 Spike S-3: FTS5 availability and index size
 - Files: `spikes/s3_fts5.py`, `docs/design/leva-sh/spikes/S-3-fts5.md`.
 - Refs: ADR-0003, DITS §9, D-006.
 - Steps:
