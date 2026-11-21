@@ -40,6 +40,7 @@ Rules for editing this file:
 - Bin dirs, in order: `/opt/homebrew/bin`, `/usr/local/bin`, `/usr/bin`, `/bin`, `/usr/sbin`, `/sbin`, then `extra_bin_dirs`.
 - Man dirs: `manpath` output order + `/opt/homebrew/share/man` + `/usr/local/share/man` + `extra_man_paths` (deduplicated, missing dirs ignored).
 - Origin: HOMEBREW if the path is under `/opt/homebrew` or `/usr/local`, else MACOS.
+- Amended 2026-11-21: `manpath` runs with the user's `PATH` and `MANPATH` (injected from `leva.cli`) plus the fixed locale variables; the extras are still appended after its output. Reason: S-2 finding 12. With a minimal PATH, `manpath` omits the Homebrew dirs, so the CLT `git(1)` would beat the Homebrew one, whose binary wins the bin-dir order.
 - **D-005 Entry catalog.**
 - Man pages: one entry per (name, section); the first in man-dir order wins (`man` semantics). The CLT SDK copy is dropped. Origin comes from the dir. `ManFile` carries `name` and `dir_index`.
 - `.so` stubs never become entries: they add an alias on the target entry.
@@ -52,13 +53,24 @@ Rules for editing this file:
 - Rank per name: sort by (not curated, not has_man, section order 1 < 8 < other < None, kind executable/manpage before builtin, origin zsh < bash, id); rank 0 is the primary.
 - Curated attachment targets the best entry for (name[, section]) using the same key without "curated", then everything is re-ranked.
 - `Repository.get_entry(name, section=None)`: exact name match by rank, else alias match ordered by (rank, name, id). `section=None` means any section.
+- Amended 2026-11-21: the winner per (name, section) is chosen over all copies in man-dir order, stubs included. Then a winning stub is handled by its target:
+  - target's (name, section) is an entry: the stub adds an alias on it;
+  - target resolves outside every man dir: the stub is rendered as itself (mandoc follows the `.so` from the man root, D-007) and indexed under its own name;
+  - target missing: the stub is skipped and counted.
+  Targets resolve against the man root, then against the page's dir, gz-aware; `..` paths are allowed. The section is the directory's; files whose extension does not start with it are skipped. Reason: S-2 findings 2–3. `rsync(1)` is a stub to openrsync(1) and must shadow the SDK's unrelated real page; 58 Xsan stubs point outside the man dirs.
 - **D-006 Schema refinements.** Unique index on `entry(name, IFNULL(section,''), origin)`. Add `entry.rank INT` and `subcommand.body TEXT`. FTS5 is contentless, filled at finalize. Unchanged otherwise.
 - **D-007 Rendering.** `.so` stubs are detected from the roff source (gz-aware) before rendering. Overstrike is stripped in Python (no `col` subprocess). Output is `mandoc -T ascii -O width=80`. Status: confirm in S-2.
+- Amended 2026-11-21: confirmed by S-2. Python stripping equals `col -bx` on 2598 of 2598 pages. The output is pure ASCII, and a glyph mandoc cannot transliterate becomes `<?>`. Width 80 is a target, not a limit: 375 pages have longer lines. Additions:
+  - mandoc runs with cwd = the page's man root (the parent of `man<sec>/`), so `.so` requests resolve as they do for `man`;
+  - mandoc exits 0 for empty, garbage or `.so`-broken input, so an output with no non-blank line between the header and footer raises ManRenderError, as a non-zero exit or a timeout does;
+  - `stub_target` returns the raw `.so` path.
+  This replaces the `col -bx` step of ADR-0002 §3. Reason: S-2 findings 1, 2 and 4–6.
 - **D-008 Subcommands.**
 - `known: Mapping[str, KnownPage(name, summary, synopsis)]` replaces `Mapping[str, Entry]`.
 - Hyphen rule: page `P-s` is a subcommand of P only if its SYNOPSIS starts with `P s`.
 - Section lists: headings matching `(SUB)?COMMANDS|VERBS`, excluding `CUSTOM EXTERNAL COMMANDS`. Terms whose first token matches `^[a-z][a-z0-9_.-]*$`.
 - Merge by name with priority curated > probe > section > hyphen, per field (summary, body, entry_name = first non-empty). Union of names, sorted.
+- Amended 2026-11-21: "headings matching" means a full match of the whole heading text. Every section with a matching heading is scanned, repeated headings included (launchctl has two `SUBCOMMANDS`). Reason: S-2 finding 11. A substring search would also take `OPTIONS INHERITED FROM PARENT COMMANDS` (88 gh pages) and `SHELL BUILTIN COMMANDS`.
 - **D-009 Probes.**
 - Allowlist built only from curated `help_probe: {args: [...], profile: two-col|git-list|brew-commands}`. The binary resolves to the first scanned executable.
 - env: `PATH=/usr/bin:/bin:/usr/sbin:/sbin`, HOME and cwd in a temp dir, `LC_ALL=LANG=en_US.UTF-8`, `LANGUAGE=en`, `NO_COLOR=1`, `TERM=dumb`, `HOMEBREW_NO_AUTO_UPDATE=1`, `HOMEBREW_NO_ANALYTICS=1`, `HOMEBREW_NO_ENV_HINTS=1`.
@@ -101,3 +113,9 @@ Rules for editing this file:
   - the print rule flags any reference to the builtin `print` (also `builtins.print`), not only calls;
   - the private-import rule flags any `leva.X.<..._private...>` path used outside `leva.X`, including private attributes reached through an imported name (`Store._cache`) and relative imports. Dunder names (`__main__`, `__version__`) are not private.
 - **D-026 Coverage gate details (2026-11-21).** Reason: D-019 leaves the arithmetic and edge cases open. `tools/coverage_gate.py` computes coverage as coverage.py does with branch coverage, (covered lines + covered branches) / (statements + branches), summed per top-level package; compares exactly (no rounding) and displays rounded down; gates the root `leva/__init__.py` as package `leva` at 85%; gates `overall` at 85% over all packages with statements; exits 2 when the report is unreadable, lacks branch data or has malformed summaries.
+- **D-027 Rendered man text layout (2026-11-21).** Reason: S-2 measured the `mandoc -T ascii` layout on 2598 pages, and parts of ADR-0002 §4 and T-2.5 assumed uppercase headings. This changes ADR-0002 §4 ("intestazione a colonna 0 in maiuscolo").
+  - The header and footer are the first and last non-blank lines. They are dropped without matching any pattern (41 headers do not match `TITLE(SEC) volume TITLE(SEC)`).
+  - A heading is any other column-0 line that contains at least one letter, in any case (`Sed Addresses`, `Incompatible Changes`, `Name`). Column-0 lines without letters (`____` rules) are body text. Lines at indent 3 are subsection headings and stay in the body.
+  - NAME is found without regard to case. A page without NAME keeps `name_hint` as its only name. A NAME without a separator yields an empty summary.
+  - Section bodies start at indent 5. Definition lists use per-page indents: first-level terms sit at the minimal indent of the body, descriptions at the next deeper indent (9 to 17 observed), and nested lists go deeper still. A term may share its line with the start of its description, separated by two or more spaces (inline term). Consecutive term lines share one description.
+  - Lines may exceed the render width (up to 512 observed). `<?>` stands for a glyph mandoc cannot transliterate (the Apple logo in 488 footers).

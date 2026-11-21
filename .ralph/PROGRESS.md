@@ -24,3 +24,10 @@
 - pyproject: targeted filterwarnings ignore for pytest-socket's pre-raise UserWarning; ruff `known-first-party = ["tests", "tools"]` (repo root is not a ruff src root).
 - Tests import helpers as `from tests.support.fake_bin import fake_bin` / `from tests.arch.rules import ...` (`tests` is a namespace package; `pythonpath = ["."]`). Test code also passes `mypy --explicit-package-bases tests/...` (not gated).
 - `tests/` own `tmp_path` contains `home/` (from clean_env): tests that list `tmp_path` must account for it.
+
+## 2026-11-21T03:22:10Z T-0.4 Spike S-2: mandoc on sample pages + full benchmark — DONE
+- `spikes/s2_mandoc.py` (`--quick`, `--json`, `--repeat`) + `docs/design/leva-sh/spikes/S-2-mandoc.md`. 2598 unique non-stub pages, 0 failures; 8 workers 4.18 s median (plateau from 4 workers). No U-S2.
+- D-007 confirmed + amended (cwd = man root; header/footer-only output is a failed render; mandoc exits 0 even for garbage). D-004 amended (manpath needs user PATH/MANPATH), D-005 amended (winner chosen with stubs; stub → alias / render itself / skip), D-008 clarified (full match), D-027 new (rendered layout: any-case column-0 headings, per-page deflist indents, inline terms).
+- R10 edits applied to T-2.2, T-2.4, T-2.5, T-2.6, T-6.3 (see the doc's "Impact on plan").
+- Bash `ls`/`uname`/`xcode-select` on system paths are denied in this loop; Glob works on system paths but does not follow Homebrew symlinks. Run system probes through a spike/test script via `uv run`.
+- Raw reports live in gitignored `spikes/out/`. openssl has no man1 page on this Mac (no `.1ssl` files).

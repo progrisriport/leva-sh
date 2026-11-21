@@ -199,7 +199,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - a planted violation in a tmp tree is reported (tested);
   - `make check` is green.
 
-- [ ] T-0.4 Spike S-2: mandoc on sample pages + full benchmark
+- [x] T-0.4 Spike S-2: mandoc on sample pages + full benchmark
 - Files: `spikes/s2_mandoc.py`, `docs/design/leva-sh/spikes/S-2-mandoc.md`.
 - Refs: ADR-0002, ANALYSIS §9, D-004, D-005, D-007, D-008.
 - Steps:
@@ -354,7 +354,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Refs: DITS §5; ADR-0002 §2; D-004.
 - Steps:
   - `discover_man_dirs(manpath_output, extra)` (pure: split on `:`, dedup keeping the first occurrence, append the Homebrew/local dirs and extras).
-  - `run_manpath(binary="/usr/bin/manpath", timeout=5)` raises IngestError on failure.
+  - `run_manpath(env, binary="/usr/bin/manpath", timeout=5)` raises IngestError on failure. `env` is the injected user environment: only `PATH` and `MANPATH` are passed on, plus the locale variables (D-004 amendment, S-2).
   - `ManPageLocator(man_dirs, sections)`:
     - scans `man<sec>/`;
     - parses `name.sec[suffix][.gz]`, e.g. `openssl-x509.1ssl` → name `openssl-x509`, section `1`;
@@ -381,8 +381,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Steps:
   - `strip_overstrike(text)`: pure; handles `X\bX` and `_\bX`.
   - `read_man_source(path)`: gz-aware; decodes UTF-8 with `errors="replace"`.
-  - `stub_target(source) -> tuple[str, str] | None` for `.so manN/x.N`.
-  - `ManRenderer` Protocol; `MandocRenderer(binary, width, timeout)`: argv `-T ascii -O width=W`, env `LC_ALL=en_US.UTF-8`, `MANWIDTH`, `TZ=UTC`; returns stripped text; errors raise ManRenderError.
+  - `stub_target(source) -> str | None`: the raw path of a leading `.so` request (`manN/x.N`, or a relative path through `..`), skipping roff comments. Resolution against the man root happens in ingest (D-005 and D-007 amendments, S-2).
+  - `ManRenderer` Protocol; `MandocRenderer(binary, width, timeout)`: argv `-T ascii -O width=W`, env `LC_ALL=en_US.UTF-8`, `MANWIDTH`, `TZ=UTC`, cwd = the page's man root (`path.parent.parent`); returns stripped text. A non-zero exit, a timeout, or an output with no non-blank line between the header and footer raises ManRenderError (D-007 amendment).
   - Integration tests (skipped if mandoc is absent) on synthetic `.1` files.
 - Accept: `uv run pytest tests/unit/test_manparse_overstrike.py tests/unit/test_manparse_stub.py -q`; `uv run pytest -m integration tests/integration/test_mandoc_renderer.py -q`; `make check`.
 
@@ -391,8 +391,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Refs: DITS §6; ADR-0002 §4; TEST-STRATEGY (manparse row, §3); S-2.
 - Steps:
   - `ParsedMan(names, summary, sections, redirect_to)`.
-  - Headings are column-0 uppercase lines; drop the header and footer lines; keep duplicate headings as separate sections in order.
-  - NAME parsing:
+  - Headings are column-0 lines containing a letter, in any case (D-027). Drop the header and footer (the first and last non-blank lines). Keep duplicate headings as separate sections in order.
+  - NAME parsing (the NAME heading is matched without regard to case):
     - split on the first `\s+(-|--|–|—)\s+`;
     - names are comma-separated, including `[`;
     - multi-line NAME is supported;
@@ -400,7 +400,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
     - names fall back to `name_hint`.
   - Odd or empty text degrades to a single DESCRIPTION section; never raises.
   - Hypothesis "never raises".
-  - Golden fixtures: ls-like, test/`[`, multi-line NAME, non-standard headings, duplicate headings, empty, >1 MB text.
+  - Golden fixtures: ls-like, test/`[`, multi-line NAME, non-standard headings (including title-case `Name` and a letterless `____` rule line), duplicate headings, empty, >1 MB text.
 - Accept: `uv run pytest tests/unit/test_manparse_parse.py -q`; `make check`.
 
 - [ ] T-2.6 `leva.manparse` (C): definition lists and builtins
@@ -409,7 +409,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Steps:
   - `definition_items(body) -> list[DefinitionItem(terms, description)]`:
     - a term line sits at the minimal indent and its description at a deeper indent;
-    - consecutive term lines are grouped (`. file` + `source file`).
+    - consecutive term lines are grouped (`. file` + `source file`);
+    - indents are relative to the body, never fixed columns. An inline term (term, then two or more spaces, then text on the same line) starts its description on that line (D-027).
   - `extract_builtins(parsed, heading="SHELL BUILTIN COMMANDS") -> list[BuiltinDoc(name, synopsis, summary, body)]`:
     - name = first token of each term;
     - summary = first sentence of the description, ≤200 chars;
@@ -587,7 +588,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Refs: D-005 (all rules), FR-2, FR-3.
 - Steps:
   - A pure function that turns pages, executables and builtins into catalog entries with aliases, sections and ranks.
-  - One test per D-005 rule: echo three ways, cd via stub plus builtin, `[` alias, exe-only, an exe attached through an alias, section 1 vs 8, CLT duplicate, Homebrew-first manpath.
+  - One test per D-005 rule: echo three ways, cd via stub plus builtin, `[` alias, exe-only, an exe attached through an alias, section 1 vs 8, CLT duplicate, Homebrew-first manpath, a stub shadowing a later real page (rsync), a stub whose target is outside the man dirs (Xsan), a stub with a missing target.
 - Accept: `uv run pytest tests/unit/test_ingest_catalog.py -q`; `make check`.
 
 - [ ] T-6.4 `leva.ingest` (D): enrichment
