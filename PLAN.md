@@ -264,7 +264,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] U-4 [USER] Confirm the curated command list and batch priorities (NB-5, Phases 7 and 10). Non-blocking; the default is the order in this plan.
 
-- [ ] T-0.R Phase 0 review
+- [x] T-0.R Phase 0 review
 - Files: `docs/design/leva-sh/reviews/phase-0.md`, `DECISIONS.md`, PLAN.md (future tasks only, per R10).
 - Steps:
   1. Check the scaffold against CLAUDE.md.
@@ -276,11 +276,12 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-1.1 `leva.model`: errors and value objects
 - Files: `src/leva/model/{__init__.py,_errors.py,_types.py}`, `tests/unit/test_model.py`.
-- Refs: DITS §0 (errors), §1; D-003, D-011.
+- Refs: DITS §0 (errors), §1; D-003, D-011, D-030.
 - Steps:
   - `LevaError(message, hint=None)` with `__str__` returning the message. Subclasses IngestError, ManRenderError, ContentError, IndexUnavailableError, ClipboardError, VerificationError, ConfigError.
   - StrEnum `Origin` and `Kind`.
   - Frozen slotted `Entry`, `Section`, `Example`, `Note`, `Subcommand(name, summary, entry_name, source, body="")`.
+  - `Example` gains `danger: str | None = None` (non-empty, no newline, when set; D-030).
   - Invariants in `__post_init__` raise `ValueError`:
     - names are non-empty with no whitespace;
     - `Example.cmd` is non-empty with no newline unless preceded by `\`;
@@ -469,9 +470,11 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-4.1 `leva.store` (A): schema, IndexWriter, open_readonly
 - Files: `src/leva/store/{__init__.py,_writer.py,_open.py}`, `src/leva/store/migrations/0001_init.sql`, `tests/unit/test_store_writer.py`.
-- Refs: DITS §9; ADR-0003; D-006.
+- Refs: DITS §9; ADR-0003; D-006; D-029; D-030.
 - Steps:
   - Schema v1 per DITS plus the D-006 changes: `entry.rank`, the null-safe unique index, `subcommand.body`, indexes on alias/name.
+  - The `intent` table gains `ord INT` (curated list order, 0-based; D-029); the `example` table gains `danger TEXT` (NULL when absent; D-030).
+  - `add_intents(entry_id, texts: Sequence[str])` stores `ord` = list index (DITS §9 has no intent writer); `add_examples` stores `danger`.
   - `SCHEMA_VERSION` = `PRAGMA user_version`.
   - `NewEntry` dataclass.
   - `IndexWriter(path)`: the path must not exist; one transaction; `__exit__` rolls back and closes on exception; `add_*` methods; sqlite errors become IngestError.
@@ -498,16 +501,17 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
     - ls, tar, grep, find, sed, du, df, chmod, curl, pbcopy, open, ditto, unzip, zip, gzip, kill, pkill, ps;
     - git + git-commit + git-log, diskutil (with subcommands), brew;
     - echo (macos + zsh + bash), cd (zsh builtin), test with alias `[`;
-    - an exe-only entry; a curated entry with examples (curated + tldr duplicate); notes; related; long sections.
+    - an exe-only entry; a curated entry with examples (curated + tldr duplicate, one with `danger`, D-030); notes; related; long sections.
   - Deterministic clock.
   - Fixture `fixture_index(tmp_path)` in conftest.
 - Accept: `uv run pytest tests/unit/test_index_factory.py -q`; `make check`.
 
 - [ ] T-4.4 `leva.repo`: Repository
 - Files: `src/leva/repo/{__init__.py,_rows.py,_fts.py}`, `tests/unit/test_repo.py`.
-- Refs: DITS §10; D-005, D-010.
+- Refs: DITS §10; D-005, D-010, D-029, D-030.
 - Steps:
   - `NameRow(entry_id, name, section, kind, origin, summary, curated, aliases, intents)`, `FtsHit(entry_id, score)`, `IndexStats`.
+  - `NameRow.intents` is ordered by `intent.ord` (D-029); `examples(entry_id)` returns each `Example` with its `danger` (D-030).
   - `get_entry(name, section=None)`: name match ordered by rank, then alias match.
   - The other query methods; ordered results.
   - `fts(query, limit)`: tokens quoted, operators and `"` `*` `-` `NEAR` `:` neutralised, empty → []; bm25 with weights name > intents > summary > body.
@@ -522,7 +526,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-5.1 `leva.search`: Searcher
 - Files: `src/leva/search/{__init__.py,_ranking.py}`, `tests/unit/test_search.py`, `tests/fixtures/index/gold_mini.json` (30 queries).
-- Refs: DITS §11; ADR-0003; D-010; D-029 (intent ranking + `via`)
+- Refs: DITS §11; ADR-0003; D-010; D-029 (intent ranking + `via`); D-031
 - Steps:
   - `Weights`/`DEFAULT_WEIGHTS`.
   - Candidates: in-memory NameRows loaded once (exact name/alias, prefix, `rapidfuzz.fuzz.WRatio ≥ 80` on names/aliases, intent token match) + FTS hits.
@@ -530,6 +534,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - `why` per D-010; ties broken by (name, section, origin).
   - Dedup by entry_id; ≤ limit; blank query → [].
   - `SearchResult` with section/kind/origin.
+  - `SearchResult` gains `via: str | None` (the matched intent text, D-029); intent tiers: exact phrase > all words > partial, then lower `ord` first.
+  - `Searcher.nearest_names(query, limit=3) -> list[str]`: best `rapidfuzz` WRatio over names and aliases with no threshold, distinct names, ties by name; blank query → [].
   - Tests: gold mini ≥ 27/30 in the top 3, typos (`gerp` → grep), case, multiple spaces, 1-char query, unicode/emoji, very long query, stable order.
 - Accept: `uv run pytest tests/unit/test_search.py -q`; coverage ≥90%; `make check`.
 
@@ -540,9 +546,10 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-5.3 `leva.library`: Library facade
 - Files: `src/leva/library/{__init__.py,_card.py,_history.py}`, `tests/unit/test_library.py`.
-- Refs: DITS §12; DESIGN-PATTERNS (library); D-011.
+- Refs: DITS §12; DESIGN-PATTERNS (library); D-011; D-031.
 - Steps:
   - `Card`.
+  - `Library.nearest_names(query, limit=3)` delegates to the Searcher (D-031).
   - `open(name)`:
     - name or alias;
     - multi-word input: try `<a>-<b>` hyphen entry first, else `open_subcommand`;
@@ -593,10 +600,10 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-6.4 `leva.ingest` (D): enrichment
 - Files: `src/leva/ingest/_enrich.py`, `tests/unit/test_ingest_enrich.py`.
-- Refs: D-005, D-008, D-009, D-011, D-017, D-021.
+- Refs: D-005, D-008, D-009, D-011, D-017, D-021, D-030.
 - Steps:
   - Subcommands: run the extractors chain per entry, plus probes declared by curated `help_probe` (allowlist built from curated content + scanned executables), then merge.
-  - Curated attachment: explain, intents, notes, examples, related (only names that resolve), subcommands; `curated` flag; re-rank.
+  - Curated attachment: explain, intents, notes, examples (each with its `danger`, D-030), related (only names that resolve), subcommands; `curated` flag; re-rank.
   - tldr attachment.
   - Curated commands that are not installed are skipped and reported.
 - Accept: `uv run pytest tests/unit/test_ingest_enrich.py -q`; `make check`.

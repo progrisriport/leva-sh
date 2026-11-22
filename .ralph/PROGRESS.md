@@ -56,3 +56,12 @@
 - For T-8.x: the design-system text will only exist after U-2; T-8.1..T-8.10 must rely on what the current file already approves, T-8.11 stays blocked by U-2. If U-2 rejects a [Leva] item, re-plan the affected T-8.x task.
 - pydf-tool's unused `$surface-accent` (`#2B2416`) is noted as a side remark only; not Leva's to fix.
 - Reviewer fixes: P-2 fallback wording plural, P-5 cross-reference to "Convenzioni visive, voce 13", two overlong lines reflowed.
+
+## 2026-11-22T04:49:08Z T-0.R Phase 0 review — DONE
+- Review note `docs/design/leva-sh/reviews/phase-0.md`: RC 1–10 (most n.a. before Phase 1), T-0.R steps 1–3 confirmed by grep, findings F-1..F-10 all fixed.
+- New arch rule `dev-code`: src may not use `spikes`, `tests` or `tools` (D-025 amended); three planted cases and a prefix trap pin it.
+- R10 edits carrying D-029/D-030/D-031 into lower layers: T-1.1 `Example.danger`; T-4.1 `intent.ord`, `example.danger`, `add_intents` (ord = list index); T-4.3 fixture example with `danger`; T-4.4 intents by `ord`, `examples()` returns `danger`; T-5.1 `SearchResult.via`, `Searcher.nearest_names`; T-5.3 `Library.nearest_names`; T-6.4 copies `danger`.
+- D-016 amended: the denylist has 47 distinct names (`softwareupdate` listed twice). D-029 amended: no synonym field in v1; a synonym is one more curated intent.
+- Warning for T-1.1/T-3.1: `Example` only stores the `danger` text (non-empty, single line when set); the D-016 destructive-pattern check belongs to content validation (T-3.1).
+- `diff -q` against the external design system was denied by the permission mode; identity checked by reading both files (119 lines each).
+- Reviewer fixes: F-10 (writer for ordered intents, repo read-back and fixture example for `danger`), recorded in the note and in the D-029/D-030 amendments.

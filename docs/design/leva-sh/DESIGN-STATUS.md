@@ -5,7 +5,7 @@
 
 ## Fasi
 - [x] 1. Discovery — done (greenfield)
-- [ ] 2. Analysis — doing (contenuto elaborato, ma `ANALYSIS.md` NON scritto su disco: la scrittura e' stata rifiutata dall'harness; contenuto restituito nel report al chiamante, da salvare come `ANALYSIS.md`)
+- [x] 2. Analysis — done
 - [x] 3. Stack recommendation — done (ADR-0001)
 - [x] 4. Architecture — done
 - [x] 5. Design patterns — done
@@ -16,7 +16,7 @@
 - [ ] 10. Report — doing
 
 ## Self-review: fallimenti annotati
-- `ANALYSIS.md` mancante: PRD/ARCHITECTURE/altri doc lo linkano (link pendente) e il PRD rimanda ad esso per i dettagli dei rischi. Da risolvere salvando il contenuto fornito nel report.
+- `ANALYSIS.md` presente, salvato dopo la sessione di progettazione: i link nei doc non sono piu' pendenti.
 - Check meccanici sui doc presenti: nessun marcatore di lavoro incompleto, nessuna sezione vuota, ogni FR/NFR tracciato in ARCHITECTURE sez. 7, nessuna contraddizione residua nota (corretto ADR-0003 vs schema).
 
 ## Quality gate

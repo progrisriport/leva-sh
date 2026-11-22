@@ -19,6 +19,11 @@ Binding order when sources disagree: `PLAN.md` §3–4 (process) > `DECISIONS.md
 | `docs/design/leva-sh/TEST-STRATEGY.md` | Test pyramid, per-module tests, edge cases (§3), determinism (§5) |
 | `docs/design/leva-sh/ANALYSIS.md` | Risks, dependencies, initial curated command list, spikes |
 | `docs/design/leva-sh/ADR/ADR-0001..0006` | Stack, man ingest, storage, curated content, TUI, distribution |
+| `docs/design/leva-sh/UX.md` | UX spec: launcher + card, tabs, history, empty states (binding via D-028) |
+| `docs/design/leva-sh/demo/leva-demo.html` | Reference web demo of the UX concept (D-028) |
+| `docs/design/leva-sh/DESIGN-STATUS.md` | Status of the design session: phases, self-review, open questions NB-1..NB-9 |
+| `docs/design/leva-sh/design-system-update-proposal.md` | Proposed text for the external design system (T-0.7, input to U-2) |
+| `docs/research/2026-11-21-competitors-and-tui-patterns.md` | Research on competing tools and TUI patterns |
 | `docs/design/leva-sh/spikes/` | Spike findings (S-1, S-2, S-3, NB-3); spike code lives in `spikes/` |
 | `docs/design/leva-sh/reviews/` | Phase reviews `phase-N.md`, `ingest-live.md`, `final.md` |
 | `docs/design/design-system-snapshot.md` | Repo copy of the external Flosh TUI design system |
@@ -74,13 +79,15 @@ from `manparse.extract_builtins` in ingest (D-002).
 Stdlib restrictions (AST arch tests in `tests/arch/`): `subprocess` only in clipboard, sources,
 manparse, verify; `sqlite3` only in store, repo, cli; `os.environ`/`os.getenv`/`os.putenv` only
 in cli; no socket/urllib/http/ssl/ftplib/smtplib anywhere in `src`; `print(` only in `cli` and
-`verify/__main__.py`; `leva.X._private` imported only from inside `leva.X`.
+`verify/__main__.py`; `leva.X._private` imported only from inside `leva.X`; `src` never imports
+`spikes`, `tests` or `tools` (D-024).
 
 ## Coding conventions
 
 - Target Python ≥3.11 (develop on 3.13): no 3.12+ syntax or stdlib APIs (no `type` statements,
-  no PEP 695 generics, no `itertools.batched`). Every module starts with
-  `from __future__ import annotations`.
+  no PEP 695 generics, no `itertools.batched`). Every module with code starts with
+  `from __future__ import annotations` (enforced by ruff `required-imports`; docstring-only
+  modules are exempt).
 - Domain types are `@dataclass(frozen=True, slots=True)`. Ports are `typing.Protocol` named by role
   (`Clipboard`, `ManRenderer`, `ContentProvider`, `SubcommandExtractor`, `ProgressSink`); adapters
   carry a technology prefix (`PbcopyClipboard`, `MandocRenderer`, `CuratedYamlProvider`).
@@ -176,6 +183,8 @@ decisions: ADR-0005, D-012, D-013, S-1 findings.
 - Verify modes: prefer `exec` with fixtures created by `setup` inside the sandbox; `static` for
   commands on the exec denylist (D-016) or nondeterministic output; `skip` with `reason` only for
   destructive or privileged examples. Targets: exec ≥60%, skip <15% (cumulative, `--stats`).
+- Examples whose command matches a D-016 destructive pattern must carry a specific `danger`
+  reason (D-030); validation fails otherwise.
 - Licensing: curated content is CC BY 4.0 (`LICENSE-CONTENT`), code is MIT (`LICENSE`). Never copy
   man page or tldr prose. tldr data enters only through `tools/vendor_tldr.py` with
   `SOURCE.json` and `ATTRIBUTION.md` (D-017).

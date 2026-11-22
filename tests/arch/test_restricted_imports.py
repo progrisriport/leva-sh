@@ -179,6 +179,13 @@ PLANTED = [
         "private-import",
         id="owner-prefix-trap",
     ),
+    pytest.param("leva/store/_a.py", "import spikes.s2_mandoc\n", "dev-code", id="spikes"),
+    pytest.param(
+        "leva/tui/_a.py", "from tests.support.fake_bin import fake_bin\n", "dev-code", id="tests"
+    ),
+    pytest.param(
+        "leva/cli/_a.py", "import tools.coverage_gate\n", "dev-code", id="tools-even-in-cli"
+    ),
 ]
 
 
@@ -214,6 +221,7 @@ ALLOWED = [
     pytest.param("leva/tui/_a.py", "from leva import __version__\n", id="dunder"),
     pytest.param("leva/tui/_a.py", "from leva.verify import __main__\n", id="dunder-module"),
     pytest.param("leva/tui/_a.py", "from __future__ import annotations\n", id="future"),
+    pytest.param("leva/tui/_a.py", "import toolsx\nimport testsuite\n", id="dev-code-prefix-trap"),
 ]
 
 

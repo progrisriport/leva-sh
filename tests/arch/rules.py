@@ -113,6 +113,7 @@ RULES: Final[tuple[Rule, ...]] = (
     Restriction(
         "print", frozenset({"builtins.print"}), frozenset({"leva.cli", "leva.verify.__main__"})
     ),
+    Restriction("dev-code", frozenset({"spikes", "tests", "tools"}), frozenset()),
     PrivateImport(root="leva"),
 )
 
