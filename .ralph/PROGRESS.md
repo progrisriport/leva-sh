@@ -73,3 +73,10 @@
 - Warning for T-3.1/T-6.x: model raises `ValueError` (programmer error); content validation must check YAML first and raise `ContentError("file:field: reason")`, or wrap the `ValueError` with `from exc`.
 - Enum/Literal checks go through helpers typed `object`/`str` to dodge mypy `warn_unreachable`; reuse that pattern.
 - Reviewer fixes: test factories typed as `Callable[..., ValueObject]` (dropped 9 `type: ignore[operator]`), immutability test now assigns every field.
+## 2026-11-22T21:16:59Z T-1.2 `leva.placeholders` — DONE
+- `parse`, `to_plain`, `names`, `problems` over one private `_Scanner` (single left-to-right pass feeds both segments and problems); `Segment` frozen/slotted, rejects empty text. 100% branch coverage.
+- D-034 appended: a placeholder ends at the FIRST `}}` (inner `{{` and single braces belong to it); `\{{` is the only escape; `{{}}` stays literal; an unclosed `{{` makes the rest literal (backslashes in that tail are kept verbatim).
+- Contract for T-3.1: `EMPTY_PLACEHOLDER`/`UNCLOSED_PLACEHOLDER` strings, source order, at most one unclosed (always last). `{{ }}` parses as placeholder `" "` AND reports "empty placeholder": content must reject it.
+- For T-8.x / library: `parse` never raises; dedup (D-011) and `<name>` rendering (D-028) should consume `parse` segments, not re-scan.
+- Hypothesis: use `exclude_characters`/`exclude_categories` (current names) and exclude category `Cs`.
+- Reviewer fixes: split a misnamed unclosed test (inner `{{` case), added an unclosed tail with an escape, the total-input property now asserts invariants instead of "no exception".

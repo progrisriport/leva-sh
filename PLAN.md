@@ -290,7 +290,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Re-export everything from `leva.model`.
 - Accept: `uv run pytest tests/unit/test_model.py -q` (equality, hash, immutability, slots, every invariant, error message/hint); `make check`.
 
-- [ ] T-1.2 `leva.placeholders`
+- [x] T-1.2 `leva.placeholders`
 - Files: `src/leva/placeholders/__init__.py`, `tests/unit/test_placeholders.py`.
 - Refs: DITS §2; TEST-STRATEGY §4.1; D-013.
 - Steps:
