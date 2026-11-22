@@ -299,7 +299,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Hypothesis properties: the concatenation invariant; segments never empty; no two adjacent literal segments; `to_plain` is the identity on brace-free text.
 - Accept: `uv run pytest tests/unit/test_placeholders.py -q`, including the TEST-STRATEGY §4 first test verbatim; coverage of `placeholders` ≥90%; `make check`.
 
-- [ ] T-1.3 `leva.paths`
+- [x] T-1.3 `leva.paths`
 - Files: `src/leva/paths/__init__.py`, `tests/unit/test_paths.py`.
 - Refs: DITS §4; D-003.
 - Steps: `LevaPaths(data_dir, config_file, log_dir)`, `index_db`, `resolve(env, home)`:

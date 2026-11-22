@@ -80,3 +80,10 @@
 - For T-8.x / library: `parse` never raises; dedup (D-011) and `<name>` rendering (D-028) should consume `parse` segments, not re-scan.
 - Hypothesis: use `exclude_characters`/`exclude_categories` (current names) and exclude category `Cs`.
 - Reviewer fixes: split a misnamed unclosed test (inner `{{` case), added an unclosed tail with an escape, the total-input property now asserts invariants instead of "no exception".
+
+## 2026-11-22T21:21:26Z T-1.3 `leva.paths` — DONE
+- `LevaPaths(data_dir, config_file, log_dir)` frozen/slotted, `index_db = data_dir/index.db`; `resolve(env, home)` reads only `LEVA_HOME` from `env`, pure (`is_absolute` only, no `expanduser`/`resolve`/`exists`). 100% branch coverage.
+- D-035 appended: empty `LEVA_HOME` = unset; relative (incl. `~/x`) -> `ConfigError("LEVA_HOME: not an absolute path: '<v>'", hint=...)`; relative `home` -> `ValueError` (checked first, even with `LEVA_HOME` set).
+- Exports `LEVA_HOME_VAR`; `cli` (T-9.x) should use it when reading `os.environ` and pass `Path.home()` as `home`. Creating `data_dir`/`log_dir` is the caller's job.
+- For T-1.5 (config): read `LevaPaths.config_file`; for ingest (D-022): derive `index.db.new`/`index.lock` from `index_db`, they are not on `LevaPaths`.
+- Reviewer: approved without changes.
