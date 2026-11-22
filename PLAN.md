@@ -274,7 +274,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 ### Phase 1 — Domain leaves
 
-- [ ] T-1.1 `leva.model`: errors and value objects
+- [x] T-1.1 `leva.model`: errors and value objects
 - Files: `src/leva/model/{__init__.py,_errors.py,_types.py}`, `tests/unit/test_model.py`.
 - Refs: DITS §0 (errors), §1; D-003, D-011, D-030.
 - Steps:

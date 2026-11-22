@@ -65,3 +65,11 @@
 - Warning for T-1.1/T-3.1: `Example` only stores the `danger` text (non-empty, single line when set); the D-016 destructive-pattern check belongs to content validation (T-3.1).
 - `diff -q` against the external design system was denied by the permission mode; identity checked by reading both files (119 lines each).
 - Reviewer fixes: F-10 (writer for ordered intents, repo read-back and fixture example for `danger`), recorded in the note and in the D-029/D-030 amendments.
+
+## 2026-11-22T21:18:39Z T-1.1 `leva.model`: errors and value objects — DONE
+- `leva.model` = private `_errors.py` (`LevaError(message, hint=None)` + 7 subclasses, message never validated) and `_types.py` (`Origin`/`Kind` StrEnums, public Literal aliases `ExampleSource`/`Verification`/`NoteKind`, 5 frozen slotted dataclasses); 18 sorted re-exports. D-033 records the exact invariants.
+- Name rule (non-empty, no `str.isspace()` char, so NBSP is rejected) on `Entry.name`/`section`, `Example.id`, `Subcommand.name`/`entry_name`. `Example.cmd`: non-blank, no `\r`, no trailing newline, `\` before every newline. `danger`/`Subcommand.source` non-blank; nothing else constrained.
+- Warning for T-4.4 (repo): `Entry.kind`/`origin` must be enum members; convert SQLite strings with `Kind(value)`/`Origin(value)`, a plain str raises `ValueError`.
+- Warning for T-3.1/T-6.x: model raises `ValueError` (programmer error); content validation must check YAML first and raise `ContentError("file:field: reason")`, or wrap the `ValueError` with `from exc`.
+- Enum/Literal checks go through helpers typed `object`/`str` to dodge mypy `warn_unreachable`; reuse that pattern.
+- Reviewer fixes: test factories typed as `Callable[..., ValueObject]` (dropped 9 `type: ignore[operator]`), immutability test now assigns every field.
