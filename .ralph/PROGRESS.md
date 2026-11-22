@@ -87,3 +87,10 @@
 - Exports `LEVA_HOME_VAR`; `cli` (T-9.x) should use it when reading `os.environ` and pass `Path.home()` as `home`. Creating `data_dir`/`log_dir` is the caller's job.
 - For T-1.5 (config): read `LevaPaths.config_file`; for ingest (D-022): derive `index.db.new`/`index.lock` from `index_db`, they are not on `LevaPaths`.
 - Reviewer: approved without changes.
+## 2026-11-22T21:40:00Z T-1.4 `leva.clipboard` — DONE
+- `leva.clipboard`: `Clipboard` Protocol, `PbcopyClipboard(*, binary, timeout)`, `FakeClipboard(*, fail)` with `last`/`history`; one shared `_check_text` (empty or > 64 KiB UTF-8 → ValueError before any spawn). D-036 records the details. 100% branch coverage.
+- `pbcopy` runs with a read-only env of only `LANG`/`LC_CTYPE` (`MappingProxyType`, never the process env), stdout/stderr at DEVNULL; `OSError`, `TimeoutExpired` and non-zero exit all map to `ClipboardError("clipboard unavailable")`, hint None, cause logged at DEBUG.
+- For T-8.x: show `ClipboardError.message` verbatim in red; `FakeClipboard.fail` is mutable so a TUI test can flip it between copies. Callers must not pass empty text (ValueError is a programmer error): an example cmd that converts to "" cannot exist (model forbids blank cmd).
+- Fake-binary tests need absolute tool paths (`/bin/cat`, `/usr/bin/env`, `exec /bin/sleep`) because the child env has no `PATH`; reuse for sources/manparse probes.
+- Live test (`tests/live/`, `clipboard` marker) round-trips via pbpaste and restores text content only; it passed once on this Mac.
+- Reviewer fixes: `UNAVAILABLE` made private (it was public but absent from `__all__`), env dict made read-only.

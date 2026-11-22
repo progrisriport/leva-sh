@@ -309,7 +309,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - no I/O.
 - Accept: `uv run pytest tests/unit/test_paths.py -q`; `make check`.
 
-- [ ] T-1.4 `leva.clipboard`
+- [x] T-1.4 `leva.clipboard`
 - Files: `src/leva/clipboard/__init__.py`, `tests/unit/test_clipboard.py`, `tests/live/test_clipboard_live.py`.
 - Refs: DITS §3; TEST-STRATEGY (clipboard row).
 - Steps:
