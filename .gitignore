@@ -35,3 +35,10 @@ spikes/out/
 .ralph/brief.md
 .ralph/review.md
 .ralph/DONE
+.ralph/phase/
+
+# Ralph loop tooling (local dev sessions, not part of the product)
+scripts/ralph.sh
+.ralph/pre.md
+.ralph/exec.md
+.ralph/post.md

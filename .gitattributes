@@ -1,0 +1,3 @@
+# Append-only logs: parallel Ralph tasks (scripts/ralph.sh v3) append entries at the end.
+.ralph/PROGRESS.md merge=union
+docs/design/leva-sh/DECISIONS.md merge=union
