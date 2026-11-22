@@ -40,3 +40,11 @@
 - D-032 new: no LIKE fallback in v1 (changes ANALYSIS R-11); without FTS5 the build fails with IngestError and doctor names it.
 - Warnings: bm25 alone ranks `ls` 4th and `tar` 2nd (unicode61 splits `git-ls-tree`): T-5.1's name stage must fix it. Unquoted `name:x` silently becomes a column filter: T-4.4 must quote every token and double embedded `"`.
 - Reviewer fixes: probe quoting check extended (`AND`, `:`, `*`, `""`), `--repeat` < 1 rejected, D-006 no longer requires optimize after the commit.
+
+## 2026-11-22T05:45:00Z T-0.6 Spike S-1: Textual transparent background (automated part) — DONE
+- `spikes/s1_textual_background.py`: demo app (`--variant transparent|surface`, `--bare`, `--seconds`), pty analyzer (`--analyze`, `--json`, `--size`), `--selftest` for `parse_sgr`/gate. Findings in `docs/design/leva-sh/spikes/S-1-textual-background.md` (12 numbered findings).
+- Recommended run writes only bg `49`, all fg in palette, glyphs `┌┐└┘│─`; output is deterministic across runs. `SURFACE_FALLBACKS` is empty: no widget needs `#1A1A1A`/`#202020`.
+- D-012 amended; R10 edit to T-8.1 (copy the S-1 Theme/TCSS, mandatory `ansi-background`/`ansi-foreground`, palette test allows only `ansi_default`/`transparent` as backgrounds).
+- Warnings for T-8.x: `Input:ansi` hard-codes cursor/placeholder (only app CSS on component classes beats it); `Input` `-invalid` and `.input--suggestion` are not overridden (tall border, dim): override if a validator/suggester is added. Any new widget (DataTable, Markdown, Select...) must be run through an analyze-style capture.
+- The analyzer needs `COLORTERM=truecolor`, else Rich downgrades to `38;5;n`. U-1 (manual check in Terminal.app/iTerm2/Ghostty) stays open and non-blocking.
+- Reviewer fixes: forbidden glyphs now include the Underline `╸╺`; theme name not duplicated; doc notes layout-only CSS omissions and the uncovered Input states.

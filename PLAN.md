@@ -229,7 +229,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   3. Write a conclusion on NFR-15, R-11 and D-006.
 - Accept: `uv run python spikes/s3_fts5.py --quick` exits 0; the doc has the interpreter table, size in MB, latencies and conclusion.
 
-- [ ] T-0.6 Spike S-1: Textual transparent background (automated part)
+- [x] T-0.6 Spike S-1: Textual transparent background (automated part)
 - Files: `spikes/s1_textual_background.py`, `docs/design/leva-sh/spikes/S-1-textual-background.md`.
 - Refs: ADR-0005, external design system, D-012.
 - Steps:
@@ -713,9 +713,9 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 - Files: `src/leva/tui/{__init__.py,theme.py,leva.tcss}`, `tests/tui/test_theme.py`.
 - Refs: ADR-0005; S-1; D-012.
 - Steps:
-  - One `Theme` (`ansi=True`, palette, ansi_default backgrounds, per S-1).
-  - `leva.tcss`: `solid` borders, `border-title-color` accent; overrides that neutralise Textual default backgrounds (S-1 list).
-  - Palette test: every colour in tcss/theme ∈ palette ∪ {`ansi_default`, surface fallback values}; no `background:` property except the S-1-documented resets/fallbacks.
+  - One `Theme` (`ansi=True`, palette, ansi_default backgrounds), copied from S-1 "Recommended theme/CSS": mandatory variables `ansi-background`/`ansi-foreground`, plus the `block-cursor-*`, `input-cursor-*`, `*-selection-*`, `border*` and `scrollbar*` variables.
+  - `leva.tcss`: copied from S-1: `solid` borders (never `tall`/`outer`), `border-title-color` accent, `Input` cursor/placeholder rules (they beat the `Input:ansi` defaults), `OptionList` highlight, `Tabs Underline { display: none }`, `Tab`, scrollbars, `Toast`.
+  - Palette test: every colour in tcss/theme ∈ palette ∪ {`ansi_default`, `transparent`}; the only `background:` value is `ansi_default` (S-1 found no widget that needs the `#1A1A1A`/`#202020` fallback); no `tall`/`wide`/`outer`/`round`/`heavy`/`double` border.
 - Accept: `uv run pytest tests/tui/test_theme.py -q`; `make check`.
 
 - [ ] T-8.2 Shared widgets: HeaderBox, FooterBar, StatusLine

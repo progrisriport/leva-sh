@@ -94,6 +94,7 @@ Rules for editing this file:
 - `CardView` is reused by CardScreen and by SearchScreen's right pane at ≥100 cols.
 - Manual text keeps its 80-column layout: no soft wrap, horizontal scroll.
 - Theme per S-1: `ansi=True`, `ansi_default` backgrounds, palette hex colours.
+- Amended 2026-11-22: the theme must also define `ansi-background` and `ansi-foreground` (`ansi_default`) and the `block-cursor-*`, `input-cursor-*`, `*-selection-*`, `border*` and `scrollbar*` variables, and the stylesheet overrides `Input` (`solid` border, cursor and placeholder rules), `OptionList` highlight, `Tabs` (underline hidden), `Tab`, scrollbars and `Toast`; the only `background:` value is `ansi_default`, and no widget needs the `#1A1A1A`/`#202020` fallback. The exact Theme and TCSS are in `spikes/S-1-textual-background.md` ("Recommended theme/CSS"). Reason: S-1 findings 1, 2, 4, 5, 6, 7, 8.
 - **D-013 Rebuild confirmation.** Press `r` twice within 3 s (status-line hint) instead of a modal: the design system forbids confirmation dialogs for non-destructive operations. Also `placeholders.problems()` is added for strict content validation.
 - **D-014 TTY.** Only TUI launches require a TTY (exit 2 otherwise). `--help`, `--version`, `--about`, `doctor` and `--rebuild` (headless, line progress on stderr) work without one.
 - **D-015 Doctor.** `--offline` runs only the checks that need neither system man pages nor an index (Python, SQLite/FTS5, content loads, versions). It is the brew `test do` mode.
