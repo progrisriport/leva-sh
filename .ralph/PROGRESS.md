@@ -48,3 +48,11 @@
 - Warnings for T-8.x: `Input:ansi` hard-codes cursor/placeholder (only app CSS on component classes beats it); `Input` `-invalid` and `.input--suggestion` are not overridden (tall border, dim): override if a validator/suggester is added. Any new widget (DataTable, Markdown, Select...) must be run through an analyze-style capture.
 - The analyzer needs `COLORTERM=truecolor`, else Rich downgrades to `38;5;n`. U-1 (manual check in Terminal.app/iTerm2/Ghostty) stays open and non-blocking.
 - Reviewer fixes: forbidden glyphs now include the Underline `╸╺`; theme name not duplicated; doc notes layout-only CSS omissions and the uncovered Input states.
+
+## 2026-11-22T04:40:26Z T-0.7 Design-system update proposal (text only) — DONE
+- `docs/design/leva-sh/design-system-update-proposal.md`: blocks P-1..P-7 (Italian proposed text), "Where to insert" anchored on the 118-line snapshot (apply bottom-up), diff summary, rationale, open questions. External file untouched.
+- Key finding (round 1): `pydf-tool` is already a Textual app (`tui.tcss` with `$surface` container backgrounds, accent-border selection, Textual `ProgressBar`, capitalised Italian status). The proposal therefore scopes rules: P-3 rules tagged [tutti]/[nuovi], P-4 items tagged [comune]/[Leva]; transparent `ansi=True` background is preferred and required for new projects and `leva-sh`, `$surface` containers stay approved for existing ones. Section "Impact on pydf-tool" states no impact per block.
+- V-1..V-6 = ADR-0005 conventions 1–6 (V-1 per D-028 `<name>` display); V-7..V-13 from UX.md, D-013, D-028..D-030; V-14/V-15 = ADR-0005 layout/no-highlighting rules.
+- For T-8.x: the design-system text will only exist after U-2; T-8.1..T-8.10 must rely on what the current file already approves, T-8.11 stays blocked by U-2. If U-2 rejects a [Leva] item, re-plan the affected T-8.x task.
+- pydf-tool's unused `$surface-accent` (`#2B2416`) is noted as a side remark only; not Leva's to fix.
+- Reviewer fixes: P-2 fallback wording plural, P-5 cross-reference to "Convenzioni visive, voce 13", two overlong lines reflowed.

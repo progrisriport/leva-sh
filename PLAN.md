@@ -247,7 +247,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] U-1 [USER] Run the S-1 demo in Terminal.app, iTerm2 and Ghostty using the checklist, and fill in the results table in `S-1-textual-background.md`. Non-blocking: the theme defaults to the S-1 recommendation; adjust in T-8.1 if results differ.
 
-- [ ] T-0.7 Design-system update proposal (text only)
+- [x] T-0.7 Design-system update proposal (text only)
 - Files: `docs/design/leva-sh/design-system-update-proposal.md`.
 - Refs: ADR-0005 (conventions 1–6, Consequences), S-1 findings, external file.
 - Steps:
