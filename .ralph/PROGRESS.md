@@ -94,3 +94,10 @@
 - Fake-binary tests need absolute tool paths (`/bin/cat`, `/usr/bin/env`, `exec /bin/sleep`) because the child env has no `PATH`; reuse for sources/manparse probes.
 - Live test (`tests/live/`, `clipboard` marker) round-trips via pbpaste and restores text content only; it passed once on this Mac.
 - Reviewer fixes: `UNAVAILABLE` made private (it was public but absent from `__all__`), env dict made read-only.
+## 2026-11-22T21:23:43Z T-1.5 `leva.config` — DONE
+- `LevaConfig(sections, extra_man_paths, extra_bin_dirs)` frozen/slotted with `__post_init__` invariants; `load_config(path, home)` reads → decodes → `tomllib` → unknown keys (sorted-first) → per-key helpers; `DEFAULT_SECTIONS = ("1", "8")`. 100% branch coverage.
+- D-037 appended: exact error strings (`<file>: cannot read file | not valid UTF-8 | invalid TOML at line N`, `<file>:<key>[<i>]: <reason>`), hint `edit <path> or delete it to use the defaults`, canonical JSON for `digest()`.
+- tomllib 3.11–3.13 reports `(at end of document)` without a line: N falls back to the text's line count.
+- For T-9.x (cli): call `load_config(paths.config_file, Path.home())`; `home` must be absolute (ValueError otherwise). For T-6.x: pass `cfg.digest()` as `config_digest`.
+- For T-2.2/T-2.3: extra paths are not deduplicated and not resolved (`..` and symlinks kept); discovery must dedup.
+- Reviewer fix: `"~//man"` expanded to `/man` (`home / "/man"` drops `home`); now strips extra leading slashes, with a test. `_sections` only accepts lists, like `_path_list`.

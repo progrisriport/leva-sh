@@ -320,7 +320,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Live test (`macos_live`, `clipboard`): pbcopy/pbpaste round trip that saves and restores the user's clipboard.
 - Accept: `uv run pytest tests/unit/test_clipboard.py -q`; `make check`.
 
-- [ ] T-1.5 `leva.config`
+- [x] T-1.5 `leva.config`
 - Files: `src/leva/config/__init__.py`, `tests/unit/test_config.py`.
 - Refs: ARCHITECTURE §5; ADR-0002 §2, §9; D-003.
 - Steps:
