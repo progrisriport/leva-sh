@@ -1,0 +1,9 @@
+LEVA-NONAME(1)           General Commands Manual          LEVA-NONAME(1)
+
+DESCRIPTION
+     A page without a NAME section.
+
+OPTIONS
+     None.
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

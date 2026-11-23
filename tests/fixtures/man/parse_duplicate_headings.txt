@@ -1,0 +1,18 @@
+LEVA-DUP(1)              General Commands Manual             LEVA-DUP(1)
+
+NAME
+     leva-dup - repeat headings
+
+SUBCOMMANDS
+     first    The first group.
+
+NOTES
+     First note.
+
+SUBCOMMANDS
+     second   The second group.
+
+NOTES
+     Second note.
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

@@ -1,0 +1,10 @@
+{
+  "name_hint": "other-name",
+  "names": ["leva-tool"],
+  "summary": "",
+  "redirect_to": null,
+  "sections": [
+    {"heading": "NAME", "body": "     leva-tool", "ord": 0},
+    {"heading": "DESCRIPTION", "body": "     Does one thing.", "ord": 1}
+  ]
+}

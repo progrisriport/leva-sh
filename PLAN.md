@@ -387,7 +387,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Integration tests (skipped if mandoc is absent) on synthetic `.1` files.
 - Accept: `uv run pytest tests/unit/test_manparse_overstrike.py tests/unit/test_manparse_stub.py -q`; `uv run pytest -m integration tests/integration/test_mandoc_renderer.py -q`; `make check`.
 
-- [ ] T-2.5 `leva.manparse` (B): `parse_man` sections and NAME
+- [x] T-2.5 `leva.manparse` (B): `parse_man` sections and NAME
 - Files: `src/leva/manparse/{_sections.py,_name.py}`, `tests/unit/test_manparse_parse.py`, `tests/fixtures/man/*.txt` (synthetic golden inputs + expected `.json`).
 - Refs: DITS §6; ADR-0002 §4; TEST-STRATEGY (manparse row, §3); S-2.
 - Steps:

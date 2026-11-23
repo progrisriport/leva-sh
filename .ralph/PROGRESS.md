@@ -132,4 +132,10 @@
 - `locate()` rescans each call, sorted by (name, section position, dir_index, file name); `ManFile.section` is the dir's section; symlink paths unresolved, mtime followed.
 - For T-6.x: the first `ManFile` per (name, section) is the D-005 winner (stubs included). cli must pass `os.environ` to `run_manpath`, `cfg.extra_man_paths` to `discover_man_dirs` and `cfg.sections` to `ManPageLocator`.
 - Not run in review: `make py311` (tool permission denied); checked by reading that a `PermissionError` from `Path.is_file` on 3.11 is caught by `_mtime_ns`.
+## 2026-11-23T02:40:02Z T-2.5 `leva.manparse` (B): `parse_man` sections and NAME — DONE
+- `ParsedMan(names, summary, sections, redirect_to=None)` frozen/slotted with D-041 invariants; `parse_man(text, *, name_hint)` total on any text, ValueError only for an invalid `name_hint`. NAME parsing in `_name.py` (`parse_name`, `is_name`, `MAX_SUMMARY`), splitting in `_sections.py`. 10 golden fixtures `tests/fixtures/man/parse_*.{txt,json}`, Hypothesis on arbitrary and mandoc-like text, >1 MB test. 100% branch coverage.
+- D-041 appended (after D-039; D-040 comes from parallel T-2.2).
+- For T-2.6: section bodies keep absolute rendered indentation (bodies at col 5, subsection lines at col 3, rstripped lines, blank edges trimmed); headings are `line.strip()`; a preamble or headingless page is a `DESCRIPTION` section; `sections` is never empty. The golden loader globs `parse_*.json` only.
+- For T-6.x: `names` may not contain the man file name; ingest uses `ManFile.name` for the entry and sets `redirect_to` via `dataclasses.replace` from `stub_target`.
+- Warning: the D-033 name rule is now implemented three times (`model._types`, `sources._names.is_entry_name`, `manparse._name.is_name`) because `leva.model` does not export it; a later cleanup could export one predicate from `leva.model` and reuse it.
 - Reviewer: approved without changes.

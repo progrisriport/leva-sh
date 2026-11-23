@@ -1,0 +1,29 @@
+LEVA-LS(1)               General Commands Manual              LEVA-LS(1)
+
+NAME
+     leva-ls - list the items of a folder
+
+SYNOPSIS
+     leva-ls [-al] [folder ...]
+
+DESCRIPTION
+     Prints the items found in each folder, one per line.
+
+   Output format
+     With a long listing the owner and size come first.
+
+     -a      Include items whose name starts with a dot.
+
+     -l      Show one item per line with owner and size.
+
+             The size is given in bytes.
+
+EXIT STATUS
+     Exits 0 on success and above 0 on error.
+
+SEE ALSO
+     leva-cat(1)
+
+macOS 27.0                 November 1, 2026                 macOS 27.0
+
+

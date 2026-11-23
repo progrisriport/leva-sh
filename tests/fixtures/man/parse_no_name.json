@@ -1,0 +1,10 @@
+{
+  "name_hint": "leva-noname",
+  "names": ["leva-noname"],
+  "summary": "",
+  "redirect_to": null,
+  "sections": [
+    {"heading": "DESCRIPTION", "body": "     A page without a NAME section.", "ord": 0},
+    {"heading": "OPTIONS", "body": "     None.", "ord": 1}
+  ]
+}

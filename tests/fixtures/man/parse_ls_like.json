@@ -1,0 +1,17 @@
+{
+  "name_hint": "leva-ls",
+  "names": ["leva-ls"],
+  "summary": "list the items of a folder",
+  "redirect_to": null,
+  "sections": [
+    {"heading": "NAME", "body": "     leva-ls - list the items of a folder", "ord": 0},
+    {"heading": "SYNOPSIS", "body": "     leva-ls [-al] [folder ...]", "ord": 1},
+    {
+      "heading": "DESCRIPTION",
+      "body": "     Prints the items found in each folder, one per line.\n\n   Output format\n     With a long listing the owner and size come first.\n\n     -a      Include items whose name starts with a dot.\n\n     -l      Show one item per line with owner and size.\n\n             The size is given in bytes.",
+      "ord": 2
+    },
+    {"heading": "EXIT STATUS", "body": "     Exits 0 on success and above 0 on error.", "ord": 3},
+    {"heading": "SEE ALSO", "body": "     leva-cat(1)", "ord": 4}
+  ]
+}

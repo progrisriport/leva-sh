@@ -1,0 +1,9 @@
+LEVA-BRACKET(1)          General Commands Manual         LEVA-BRACKET(1)
+
+NAME
+     [ -- check a condition
+
+DESCRIPTION
+     Evaluates an expression.
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

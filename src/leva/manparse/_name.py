@@ -1,0 +1,47 @@
+"""Parse the NAME section of a man page into names and a one-line summary."""
+
+from __future__ import annotations
+
+import re
+from typing import Final
+
+MAX_SUMMARY: Final = 200
+_SEPARATOR: Final = re.compile(r"\s+(?:--|-|\u2013|\u2014)\s+")
+
+
+def is_name(value: str) -> bool:
+    """Tell whether `value` is a valid entry name: non-empty, no `str.isspace()` character."""
+    return value != "" and not any(char.isspace() for char in value)
+
+
+def parse_name(body: str, name_hint: str) -> tuple[tuple[str, ...], str]:
+    """Split a NAME body into the command names and the summary.
+
+    The body is collapsed to one line, then cut at the first dash separator (` - `, ` -- `,
+    an en dash or an em dash, each between whitespace). Names are the comma-separated parts
+    before it that are valid names, without duplicates, in order.
+
+    Pre: `name_hint` is a valid name.
+    Post: names are never empty (`(name_hint,)` when none is valid); the summary is one line
+    of at most `MAX_SUMMARY` characters, empty when there is no separator.
+
+    Args:
+        body: Body of the NAME section as rendered; may be empty.
+        name_hint: Fallback name used when the body yields no valid name.
+
+    Returns:
+        The names and the summary.
+    """
+    text = " ".join(body.split())
+    match = _SEPARATOR.search(text)
+    names_part, summary = (
+        (text, "") if match is None else (text[: match.start()], text[match.end() :])
+    )
+    names = _names(names_part)
+    return (names or (name_hint,)), summary[:MAX_SUMMARY].rstrip()
+
+
+def _names(part: str) -> tuple[str, ...]:
+    """Return the valid comma-separated names of `part`, deduplicated in order."""
+    candidates = (item.strip() for item in part.split(","))
+    return tuple(dict.fromkeys(item for item in candidates if is_name(item)))

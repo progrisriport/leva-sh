@@ -1,0 +1,10 @@
+{
+  "name_hint": "[",
+  "names": ["["],
+  "summary": "check a condition",
+  "redirect_to": null,
+  "sections": [
+    {"heading": "NAME", "body": "     [ -- check a condition", "ord": 0},
+    {"heading": "DESCRIPTION", "body": "     Evaluates an expression.", "ord": 1}
+  ]
+}

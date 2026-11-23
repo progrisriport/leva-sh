@@ -1,0 +1,10 @@
+LEVA-TEST(1)             General Commands Manual            LEVA-TEST(1)
+
+NAME
+     test, [ -- check a condition
+
+SYNOPSIS
+     test expression
+     [ expression ]
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

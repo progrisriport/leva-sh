@@ -1,0 +1,9 @@
+LEVA-TOOL(1)             General Commands Manual            LEVA-TOOL(1)
+
+NAME
+     leva-tool
+
+DESCRIPTION
+     Does one thing.
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

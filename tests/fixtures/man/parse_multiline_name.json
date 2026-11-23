@@ -1,0 +1,14 @@
+{
+  "name_hint": "alpha",
+  "names": ["alpha", "beta", "gamma", "delta", "epsilon"],
+  "summary": "do several things at once",
+  "redirect_to": null,
+  "sections": [
+    {
+      "heading": "NAME",
+      "body": "     alpha, beta,\n     gamma, delta,\n     epsilon - do several things at once",
+      "ord": 0
+    },
+    {"heading": "DESCRIPTION", "body": "     Each name runs the same code.", "ord": 1}
+  ]
+}

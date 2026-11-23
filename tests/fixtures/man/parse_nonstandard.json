@@ -1,0 +1,15 @@
+{
+  "name_hint": "leva-ed",
+  "names": ["leva-ed"],
+  "summary": "edit a stream",
+  "redirect_to": null,
+  "sections": [
+    {"heading": "Name", "body": "     leva-ed - edit a stream", "ord": 0},
+    {
+      "heading": "Sed Addresses",
+      "body": "     An address selects the lines a command acts on.\n________\n     The rule above stays in the body.",
+      "ord": 1
+    },
+    {"heading": "HIGH-LEVEL COMMANDS (PORCELAIN)", "body": "     Everyday commands live here.", "ord": 2}
+  ]
+}

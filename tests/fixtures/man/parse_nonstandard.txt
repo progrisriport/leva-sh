@@ -1,0 +1,14 @@
+LEVA-ED(1)               General Commands Manual              LEVA-ED(1)
+
+Name
+     leva-ed - edit a stream
+
+Sed Addresses
+     An address selects the lines a command acts on.
+________
+     The rule above stays in the body.
+
+HIGH-LEVEL COMMANDS (PORCELAIN)
+     Everyday commands live here.
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

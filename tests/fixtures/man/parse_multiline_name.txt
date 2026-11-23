@@ -1,0 +1,11 @@
+LEVA-MULTI(1)            General Commands Manual           LEVA-MULTI(1)
+
+NAME
+     alpha, beta,
+     gamma, delta,
+     epsilon - do several things at once
+
+DESCRIPTION
+     Each name runs the same code.
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

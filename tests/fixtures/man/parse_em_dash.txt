@@ -1,0 +1,9 @@
+LEVA-X(1)                General Commands Manual               LEVA-X(1)
+
+NAME
+     leva-x — handle a-b pairs
+
+DESCRIPTION
+     Pairs are handled in order.
+
+macOS 27.0                 November 1, 2026                 macOS 27.0

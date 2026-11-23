@@ -1,0 +1,13 @@
+{
+  "name_hint": "leva-dup",
+  "names": ["leva-dup"],
+  "summary": "repeat headings",
+  "redirect_to": null,
+  "sections": [
+    {"heading": "NAME", "body": "     leva-dup - repeat headings", "ord": 0},
+    {"heading": "SUBCOMMANDS", "body": "     first    The first group.", "ord": 1},
+    {"heading": "NOTES", "body": "     First note.", "ord": 2},
+    {"heading": "SUBCOMMANDS", "body": "     second   The second group.", "ord": 3},
+    {"heading": "NOTES", "body": "     Second note.", "ord": 4}
+  ]
+}

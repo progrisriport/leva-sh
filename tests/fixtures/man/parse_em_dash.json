@@ -1,0 +1,10 @@
+{
+  "name_hint": "leva-x",
+  "names": ["leva-x"],
+  "summary": "handle a-b pairs",
+  "redirect_to": null,
+  "sections": [
+    {"heading": "NAME", "body": "     leva-x — handle a-b pairs", "ord": 0},
+    {"heading": "DESCRIPTION", "body": "     Pairs are handled in order.", "ord": 1}
+  ]
+}
