@@ -125,3 +125,11 @@
 - For T-6.2: catch `ManRenderError` per page and continue; call `stub_target(read_man_source(p))` before rendering and resolve the raw path against the man root yourself (D-005).
 - Reviewer fix: extracted a `_recording` fake-mandoc helper in `test_manparse_render.py` (four copies of the same script tail); added that test file to the PLAN T-2.4 file list as the brief stated.
 - Warning: `tests/unit/test_clipboard.py::test_both_classes_satisfy_the_clipboard_port` failed once during a gate run under parallel-worktree load and passed on rerun (fake pbcopy over the 2 s default timeout, likely). If it recurs, give that test an explicit larger timeout.
+
+## 2026-11-23T02:38:34Z T-2.2 `leva.sources` (B): ManPageLocator and man dir discovery — DONE
+- `leva.sources` adds `discover_man_dirs` (pure: manpath entries, then `/opt/homebrew/share/man`, `/usr/local/share/man`, then extras; relative dropped, dedup by `Path` equality, missing kept), `run_manpath(env, *, binary, timeout)`, `ManFile`, `ManPageLocator`. D-040 records the details. 100% branch coverage.
+- `run_manpath` child env = `PATH`/`MANPATH` from the injected mapping + `LC_ALL`/`LANG=en_US.UTF-8`; spawn error, timeout, non-zero exit -> `IngestError("cannot list man directories: manpath failed")`; blank output is valid.
+- `locate()` rescans each call, sorted by (name, section position, dir_index, file name); `ManFile.section` is the dir's section; symlink paths unresolved, mtime followed.
+- For T-6.x: the first `ManFile` per (name, section) is the D-005 winner (stubs included). cli must pass `os.environ` to `run_manpath`, `cfg.extra_man_paths` to `discover_man_dirs` and `cfg.sections` to `ManPageLocator`.
+- Not run in review: `make py311` (tool permission denied); checked by reading that a `PermissionError` from `Path.is_file` on 3.11 is caught by `_mtime_ns`.
+- Reviewer: approved without changes.

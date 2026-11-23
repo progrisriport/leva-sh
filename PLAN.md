@@ -350,7 +350,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Tests on tmp trees.
 - Accept: `uv run pytest tests/unit/test_sources_executables.py tests/unit/test_sources_system.py -q`; `make check`.
 
-- [ ] T-2.2 `leva.sources` (B): ManPageLocator and man dir discovery
+- [x] T-2.2 `leva.sources` (B): ManPageLocator and man dir discovery
 - Files: `src/leva/sources/_manpages.py`, `tests/unit/test_sources_manpages.py`.
 - Refs: DITS §5; ADR-0002 §2; D-004.
 - Steps:
