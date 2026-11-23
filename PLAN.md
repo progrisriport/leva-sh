@@ -404,8 +404,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Golden fixtures: ls-like, test/`[`, multi-line NAME, non-standard headings (including title-case `Name` and a letterless `____` rule line), duplicate headings, empty, >1 MB text.
 - Accept: `uv run pytest tests/unit/test_manparse_parse.py -q`; `make check`.
 
-- [ ] T-2.6 `leva.manparse` (C): definition lists and builtins
-- Files: `src/leva/manparse/{_definitions.py,_builtins.py}`, `tests/unit/test_manparse_builtins.py`, `tests/fixtures/man/builtins_*.txt` (synthetic, zsh-like and bash-like layouts).
+- [x] T-2.6 `leva.manparse` (C): definition lists and builtins
+- Files: `src/leva/manparse/{_definitions.py,_builtins.py}`, `tests/unit/test_manparse_builtins.py`, `tests/unit/test_manparse_definitions.py`, `tests/fixtures/man/builtins_*.txt` (synthetic, zsh-like and bash-like layouts).
 - Refs: ADR-0002 §5; FR-3; S-2; D-002.
 - Steps:
   - `definition_items(body) -> list[DefinitionItem(terms, description)]`:

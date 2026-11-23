@@ -1,0 +1,36 @@
+LEVA-ZSHB(1)              General Commands Manual              LEVA-ZSHB(1)
+
+NAME
+     leva-zshb - sample shell builtins, zsh layout
+
+SHELL BUILTIN COMMANDS
+     - simple command
+             Marks the next word as a plain command, so no wrapper changes how it is
+             run.
+
+     . file [ arg ... ]
+     source file [ arg ... ]
+             Reads commands from file and runs them in the current shell.  Any
+             arguments become the positional parameters while it runs.
+
+     alias [ -gmrsL ] [ name[=value] ... ]
+             Defines or lists aliases.  Without arguments every alias is printed.
+
+             -g      Make the alias global.
+
+                     It is replaced anywhere in a command line.
+
+             -L      Print each alias in a form that can be read back as input.
+     echo [ -neE ] [ arg ... ]
+             Writes the arguments separated by spaces, followed by a newline. Escape
+             handling depends on the options.
+     print [ -nr ] [ arg ... ]
+     print -f format [ arg ... ]
+             Writes the arguments to the terminal, like echo but with more options.
+
+     true  Does nothing and succeeds.
+             It always exits with status zero.
+     unalias name ...
+             Removes the named aliases.
+
+macOS 27.0                      November 1, 2026                      macOS 27.0

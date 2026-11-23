@@ -1,0 +1,33 @@
+LEVA-BASHB(1)             General Commands Manual             LEVA-BASHB(1)
+
+NAME
+     leva-bashb - sample shell builtins, bash layout
+
+DESCRIPTION
+     A tiny page used to test builtin extraction.
+
+SHELL BUILTIN COMMANDS
+     Unless stated otherwise each builtin returns zero on success.
+     It returns a non-zero value when it fails.
+
+     : [arguments]
+             Does nothing beyond expanding the arguments.  Returns zero.
+     cd [-L|-P] [dir]
+             Changes the current directory to dir.  Then it updates the
+             variables that track the old and new place.
+
+             -L      Follow symbolic links.
+                     This is the default.
+             -P      Use the physical layout and skip links.
+     read [-r] [name ...]
+             Reads one line from standard input and splits it into the names.
+     test expr
+     [ expr ]
+             Evaluates a conditional expression and returns its result.
+     read [-s] name
+             A second, later description of read that must be ignored.
+
+SEE ALSO
+     leva-zshb(1)
+
+macOS 27.0                      November 1, 2026                      macOS 27.0
