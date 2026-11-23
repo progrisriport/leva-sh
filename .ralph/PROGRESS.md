@@ -139,3 +139,11 @@
 - For T-6.x: `names` may not contain the man file name; ingest uses `ManFile.name` for the entry and sets `redirect_to` via `dataclasses.replace` from `stub_target`.
 - Warning: the D-033 name rule is now implemented three times (`model._types`, `sources._names.is_entry_name`, `manparse._name.is_name`) because `leva.model` does not export it; a later cleanup could export one predicate from `leva.model` and reuse it.
 - Reviewer: approved without changes.
+
+## 2026-11-23T21:48:15Z T-2.3 `leva.sources` (C): ProbeRunner — DONE
+- `leva.sources.ProbeRunner(allowlist, *, timeout=5.0, max_bytes=262_144)`: argv values with absolute `argv[0]` (ValueError otherwise), read-only copy of the allowlist; `run` spawns with `shell=False`, stdin devnull, the exact D-009 env + `HOME`, cwd = HOME = `<tmp>/leva-probe-*/home`, captures into files (not pipes), new session + `killpg(SIGKILL)` on timeout. D-042 records the details. 100% branch coverage.
+- Exit status ignored (DEBUG log); text = stdout unless blank, else stderr, capped per stream in bytes then UTF-8-decoded with replacement, returned unstripped. Messages `probe not allowed|failed|timed out|output empty: <name>`.
+- For T-6.4: build the allowlist as `{name: (str(first_executable.path), *help_probe.args)}`; catch `IngestError` per probe and continue. `run` keeps no per-call state, so concurrent calls from ingest workers are safe.
+- For T-2.7: probe text may end with a newline and may contain U+FFFD.
+- Not handled on purpose: a background grandchild of a probe that exits normally is not killed (only the timeout path kills the group); curated help probes do not daemonize.
+- Reviewer fixes: the grandchild test now asserts the grandchild exits (kqueue `NOTE_EXIT`; before, it also passed with `proc.kill()` instead of `killpg`); tests whose script must write a file before the kill use a 3 s timeout (0.3/0.5 s failed under parallel-worktree load); ValueError tests match the messages.

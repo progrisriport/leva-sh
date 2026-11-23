@@ -363,7 +363,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
     - Note: DITS ManFile gains `name` and `dir_index` (D-005).
 - Accept: `uv run pytest tests/unit/test_sources_manpages.py -q`; `make check`.
 
-- [ ] T-2.3 `leva.sources` (C): ProbeRunner
+- [x] T-2.3 `leva.sources` (C): ProbeRunner
 - Files: `src/leva/sources/_probe.py`, `tests/unit/test_sources_probe.py`.
 - Refs: DITS §5; ADR-0002 §6; NFR-11; D-009.
 - Steps:
