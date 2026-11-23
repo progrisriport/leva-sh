@@ -42,3 +42,6 @@ scripts/ralph.sh
 .ralph/pre.md
 .ralph/exec.md
 .ralph/post.md
+
+# Spike code (local only; findings live in docs/design/leva-sh/spikes/, D-024)
+spikes/

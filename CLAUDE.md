@@ -24,7 +24,7 @@ Binding order when sources disagree: `PLAN.md` §3–4 (process) > `DECISIONS.md
 | `docs/design/leva-sh/DESIGN-STATUS.md` | Status of the design session: phases, self-review, open questions NB-1..NB-9 |
 | `docs/design/leva-sh/design-system-update-proposal.md` | Proposed text for the external design system (T-0.7, input to U-2) |
 | `docs/research/2026-11-21-competitors-and-tui-patterns.md` | Research on competing tools and TUI patterns |
-| `docs/design/leva-sh/spikes/` | Spike findings (S-1, S-2, S-3, NB-3); spike code lives in `spikes/` |
+| `docs/design/leva-sh/spikes/` | Spike findings (S-1, S-2, S-3, NB-3); spike code lives in `spikes/` (local, gitignored) |
 | `docs/design/leva-sh/reviews/` | Phase reviews `phase-N.md`, `ingest-live.md`, `final.md` |
 | `docs/design/design-system-snapshot.md` | Repo copy of the external Flosh TUI design system |
 | `docs/CONTENT-GUIDE.md` | Guide for curated content authors (created in T-7.4) |
