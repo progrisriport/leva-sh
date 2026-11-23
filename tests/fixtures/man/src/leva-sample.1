@@ -1,0 +1,27 @@
+.Dd January 1, 2026
+.Dt LEVA-SAMPLE 1
+.Os
+.Sh NAME
+.Nm leva-sample
+.Nd tidy a synthetic collection of widgets
+.Sh SYNOPSIS
+.Nm
+.Op Fl qv
+.Ar widget ...
+.Sh DESCRIPTION
+The
+.Nm
+utility exists only to exercise the Leva renderer. It reads a list of imaginary
+widgets, sorts them by an invented weight, and then pretends to print a summary
+of everything it has seen, which is why this paragraph is deliberately long enough
+to wrap across several lines at the default width.
+.Pp
+The options are as follows:
+.Bl -tag -width Ds
+.It Fl q
+Print nothing except the final tally.
+.It Fl v
+Print one extra line for each widget that was sorted.
+.El
+.Sh EXIT STATUS
+.Ex -std

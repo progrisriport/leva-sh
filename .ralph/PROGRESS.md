@@ -117,3 +117,11 @@
 - For ingest (T-6.x): the first `Executable` per name is the winner; pass `DEFAULT_BIN_DIRS + cfg.extra_bin_dirs` as-is (the scanner dedups).
 - Tests: default macOS FS is case-insensitive, so fixtures never create names differing only by case.
 - Reviewer: approved without changes.
+## 2026-11-23T02:32:32Z T-2.4 `leva.manparse` (A): overstrike, stub detection, MandocRenderer — DONE
+- `strip_overstrike` (regex `[^\n]\x08`, then lone backspaces), `read_man_source` (gz-aware, UTF-8 replace; OSError/EOFError/zlib.error -> `ManRenderError("cannot read man page: <path>")`), `stub_target` (first non-comment line decides, raw `.so` argument), `ManRenderer` port, `MandocRenderer`. 100% branch coverage.
+- D-039 appended (placed after D-037; D-038 comes from parallel T-2.1).
+- `MandocRenderer.render`: cwd = `path.parent.parent`, read-only env `LC_ALL`/`LANG`/`MANWIDTH`/`TZ` only; messages `mandoc failed | mandoc timed out | empty man page: <path>`, hint None; empty = fewer than 3 non-blank lines.
+- For T-2.5: `render` returns overstrike-free text with the mandoc header and footer still present and columns untouched (headings col 0, bodies col 5); fixtures live in `tests/fixtures/man/src/*.1` (mdoc sample, man(7) legacy, stub + target).
+- For T-6.2: catch `ManRenderError` per page and continue; call `stub_target(read_man_source(p))` before rendering and resolve the raw path against the man root yourself (D-005).
+- Reviewer fix: extracted a `_recording` fake-mandoc helper in `test_manparse_render.py` (four copies of the same script tail); added that test file to the PLAN T-2.4 file list as the brief stated.
+- Warning: `tests/unit/test_clipboard.py::test_both_classes_satisfy_the_clipboard_port` failed once during a gate run under parallel-worktree load and passed on rerun (fake pbcopy over the 2 s default timeout, likely). If it recurs, give that test an explicit larger timeout.

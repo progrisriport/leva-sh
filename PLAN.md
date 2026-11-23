@@ -376,8 +376,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Tests with fake scripts: stdout-only, stderr-only with exit 1, sleeper, huge output, env and cwd assertions.
 - Accept: `uv run pytest tests/unit/test_sources_probe.py -q`; `make check`.
 
-- [ ] T-2.4 `leva.manparse` (A): overstrike, stub detection, MandocRenderer
-- Files: `src/leva/manparse/{__init__.py,_overstrike.py,_stub.py,_render.py}`, `tests/unit/test_manparse_overstrike.py`, `tests/unit/test_manparse_stub.py`, `tests/integration/test_mandoc_renderer.py`, `tests/fixtures/man/src/*.1` (synthetic roff only).
+- [x] T-2.4 `leva.manparse` (A): overstrike, stub detection, MandocRenderer
+- Files: `src/leva/manparse/{__init__.py,_overstrike.py,_stub.py,_render.py}`, `tests/unit/test_manparse_overstrike.py`, `tests/unit/test_manparse_stub.py`, `tests/unit/test_manparse_render.py`, `tests/integration/test_mandoc_renderer.py`, `tests/fixtures/man/src/*.1` (synthetic roff only).
 - Refs: DITS §6; ADR-0002 §3–4; S-2; D-007.
 - Steps:
   - `strip_overstrike(text)`: pure; handles `X\bX` and `_\bX`.
