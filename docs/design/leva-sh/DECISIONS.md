@@ -112,6 +112,7 @@ Rules for editing this file:
 - **D-023 CI.** The workflow is committed with `workflow_dispatch` only, so no Actions minutes are used until the user enables triggers (U-6).
 - **D-024 Spikes and reviews.** Findings live in `docs/design/leva-sh/spikes/`, reviews in `docs/design/leva-sh/reviews/`. Spike code lives in `spikes/`: ruff-checked, excluded from mypy and coverage, never imported by src.
   - Amended 2026-11-23: spike code and the Ralph loop tooling (`scripts/ralph.sh`, `.ralph/{pre,exec,post}.md`) are local-only and gitignored; earlier versions stay in git history. Findings docs, reviews, PLAN.md and `.ralph/PROGRESS.md` stay tracked (task worktrees read them). Reason: the repo keeps the design documentation and the product, not the internal dev tooling.
+  - Amended 2026-11-23: `CLAUDE.md` and `.claude/` are local-only and gitignored too; the loop copies them into every task worktree. A task that would change repo conventions records them in DECISIONS.md (tracked); edits to `CLAUDE.md` are made in the main checkout only.
 
 ## Later decisions
 

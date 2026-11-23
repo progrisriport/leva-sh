@@ -45,3 +45,7 @@ scripts/ralph.sh
 
 # Spike code (local only; findings live in docs/design/leva-sh/spikes/, D-024)
 spikes/
+
+# Agent instructions and settings (local only; the Ralph loop copies them into worktrees)
+CLAUDE.md
+.claude/
