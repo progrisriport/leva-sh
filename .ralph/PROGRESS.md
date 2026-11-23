@@ -101,3 +101,11 @@
 - For T-9.x (cli): call `load_config(paths.config_file, Path.home())`; `home` must be absolute (ValueError otherwise). For T-6.x: pass `cfg.digest()` as `config_digest`.
 - For T-2.2/T-2.3: extra paths are not deduplicated and not resolved (`..` and symlinks kept); discovery must dedup.
 - Reviewer fix: `"~//man"` expanded to `/man` (`home / "/man"` drops `home`); now strips extra leading slashes, with a test. `_sections` only accepts lists, like `_path_list`.
+
+## 2026-11-23T02:15:31Z T-1.R Phase 1 review — DONE
+- Review note `docs/design/leva-sh/reviews/phase-1.md`: RC 1–10 over model, placeholders, paths, clipboard, config; 443 tests, every Phase 1 package at 100% branch coverage, 3 import contracts kept.
+- F-1: `paths` filename constants made private `Final` (only `LEVA_HOME_VAR` is public). F-2: `PbcopyClipboard.copy` Pre/Post and `LevaPaths` Attributes documented.
+- F-3 (R10, D-033 amended): T-3.1 must check the `Example.cmd` invariants before building `Example` (a YAML `|` block ends with `\n`, which the model rejects); T-4.4 converts stored strings with `Kind(...)`/`Origin(...)`.
+- Kept on purpose: `config` loader repeats the `LevaConfig` invariants to produce `ConfigError` messages; the dataclass keeps raising `ValueError`.
+- `tests/live/test_clipboard_live.py` not run in this review (real clipboard, not part of the gate).
+- Reviewer: approved; only fixed the dates of the review note and the D-033 amendment to 2026-11-23.

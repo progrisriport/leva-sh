@@ -332,7 +332,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - `digest()` returns a stable sha256 of the normalised config.
 - Accept: `uv run pytest tests/unit/test_config.py -q`; `make check`.
 
-- [ ] T-1.R Phase 1 review (RC on model, placeholders, paths, clipboard, config)
+- [x] T-1.R Phase 1 review (RC on model, placeholders, paths, clipboard, config)
 - Accept: `reviews/phase-1.md`; `make check`.
 
 ### Phase 2 — System sources, man parsing, subcommands
@@ -436,7 +436,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-3.1 `leva.content` (A): schema types and validation
 - Files: `src/leva/content/{__init__.py,_schema.py,_validate.py,_policy.py}`, `tests/unit/test_content_validate.py`.
-- Refs: DITS §8; ADR-0004; D-010, D-016; D-030 (`Example.danger`)
+- Refs: DITS §8; ADR-0004; D-010, D-016; D-030 (`Example.danger`); D-033 (`Example.cmd` invariants)
 - Steps:
   - Dataclasses: CuratedCommand, ExampleSpec, VerifySpec, HelpProbe(args, profile), TldrPage, TldrExample; `ContentRecord = CuratedCommand | TldrPage`.
   - `validate_command(data, file) -> CuratedCommand`, strict:
@@ -445,6 +445,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
     - required summary (≤120), explain and ≥1 intent;
     - notes kinds checked; example id `^<name>-[a-z0-9-]+$`;
     - cmd uses `placeholders.problems`;
+    - cmd meets the `Example.cmd` invariants of D-033 (no `\r`, no trailing newline, `\` before every newline; a YAML `|` block ends with a newline, so strip it or reject it) before `Example` is built, so no `ValueError` escapes;
     - exec: bind covers all placeholders, `stdout_regex` compiles, exec denylist (D-016);
     - skip requires reason; `min_macos` pattern; related/subcommand names valid.
   - Messages look like `commands/tar.yaml:examples[2].cmd: unclosed placeholder`.
@@ -508,10 +509,11 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 - [ ] T-4.4 `leva.repo`: Repository
 - Files: `src/leva/repo/{__init__.py,_rows.py,_fts.py}`, `tests/unit/test_repo.py`.
-- Refs: DITS §10; D-005, D-010, D-029, D-030.
+- Refs: DITS §10; D-005, D-010, D-029, D-030, D-033.
 - Steps:
   - `NameRow(entry_id, name, section, kind, origin, summary, curated, aliases, intents)`, `FtsHit(entry_id, score)`, `IndexStats`.
   - `NameRow.intents` is ordered by `intent.ord` (D-029); `examples(entry_id)` returns each `Example` with its `danger` (D-030).
+  - `Entry.kind`/`origin` are enum members (D-033): convert the stored strings with `Kind(value)`/`Origin(value)`; a plain string raises `ValueError`.
   - `get_entry(name, section=None)`: name match ordered by rank, then alias match.
   - The other query methods; ordered results.
   - `fts(query, limit)`: tokens quoted, operators and `"` `*` `-` `NEAR` `:` neutralised, empty → []; bm25 with weights name > intents > summary > body.

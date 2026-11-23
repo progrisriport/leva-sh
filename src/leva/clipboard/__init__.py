@@ -64,6 +64,9 @@ class PbcopyClipboard:
     def copy(self, text: str) -> None:
         """Copy `text` through ``pbcopy`` (UTF-8 on stdin, minimal environment).
 
+        Pre: `text` is non-empty and at most `MAX_TEXT_BYTES` bytes in UTF-8.
+        Post: the clipboard holds exactly `text`.
+
         Raises:
             ValueError: `text` is empty or over `MAX_TEXT_BYTES` bytes.
             ClipboardError: The binary cannot run, times out or exits non-zero.

@@ -5,15 +5,16 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Final
 
 from leva.model import ConfigError
 
-LEVA_HOME_VAR = "LEVA_HOME"
-CONFIG_FILE_NAME = "config.toml"
-INDEX_DB_NAME = "index.db"
-LOG_DIR_NAME = "logs"
-
 __all__ = ["LEVA_HOME_VAR", "LevaPaths"]
+
+LEVA_HOME_VAR: Final = "LEVA_HOME"
+_CONFIG_FILE_NAME: Final = "config.toml"
+_INDEX_DB_NAME: Final = "index.db"
+_LOG_DIR_NAME: Final = "logs"
 
 
 @dataclass(frozen=True, slots=True)
@@ -21,6 +22,11 @@ class LevaPaths:
     """Where Leva keeps its data, configuration and logs.
 
     Pure value object: building or resolving it never touches the file system.
+
+    Attributes:
+        data_dir: Directory holding the index and the config file.
+        config_file: Location of ``config.toml``.
+        log_dir: Directory for the rotating log.
     """
 
     data_dir: Path
@@ -30,7 +36,7 @@ class LevaPaths:
     @property
     def index_db(self) -> Path:
         """Location of the SQLite index, inside ``data_dir``."""
-        return self.data_dir / INDEX_DB_NAME
+        return self.data_dir / _INDEX_DB_NAME
 
     @classmethod
     def resolve(cls, env: Mapping[str, str], home: Path) -> LevaPaths:
@@ -57,7 +63,7 @@ class LevaPaths:
         if leva_home:
             return _under_leva_home(leva_home)
         data_dir = home / "Library" / "Application Support" / "leva"
-        return cls(data_dir, data_dir / CONFIG_FILE_NAME, home / "Library" / "Logs" / "leva")
+        return cls(data_dir, data_dir / _CONFIG_FILE_NAME, home / "Library" / "Logs" / "leva")
 
 
 def _under_leva_home(value: str) -> LevaPaths:
@@ -68,4 +74,4 @@ def _under_leva_home(value: str) -> LevaPaths:
             f"{LEVA_HOME_VAR}: not an absolute path: {value!r}",
             hint=f"set {LEVA_HOME_VAR} to an absolute directory, or unset it",
         )
-    return LevaPaths(root, root / CONFIG_FILE_NAME, root / LOG_DIR_NAME)
+    return LevaPaths(root, root / _CONFIG_FILE_NAME, root / _LOG_DIR_NAME)
