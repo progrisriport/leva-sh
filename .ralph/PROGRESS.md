@@ -109,3 +109,11 @@
 - Kept on purpose: `config` loader repeats the `LevaConfig` invariants to produce `ConfigError` messages; the dataclass keeps raising `ValueError`.
 - `tests/live/test_clipboard_live.py` not run in this review (real clipboard, not part of the gate).
 - Reviewer: approved; only fixed the dates of the review note and the D-033 amendment to 2026-11-23.
+
+## 2026-11-23T02:31:59Z T-2.1 `leva.sources` (A): SystemInfo, ExecutableScanner, origin mapping — DONE
+- `leva.sources`: `SystemInfo.detect(*, sw_vers, timeout=5.0, machine=platform.machine)` (only `sw_vers` caller, read-only locale-only env), `origin_for` (pure, component-wise), `DEFAULT_BIN_DIRS`, `Executable`, `ExecutableScanner`. D-038 records the details. 100% branch coverage.
+- Scanner: dirs deduplicated in `__init__` (first kept), every call rescans, sorted by (name, dir index), every duplicate yielded; symlinks unresolved in `path`, followed for the file/X_OK check; names failing D-033 skipped.
+- For T-2.2: import `origin_for` from `leva.sources._origin` and `is_entry_name` from `leva.sources._names` (private, not re-exported); reuse the logger `leva.sources`.
+- For ingest (T-6.x): the first `Executable` per name is the winner; pass `DEFAULT_BIN_DIRS + cfg.extra_bin_dirs` as-is (the scanner dedups).
+- Tests: default macOS FS is case-insensitive, so fixtures never create names differing only by case.
+- Reviewer: approved without changes.

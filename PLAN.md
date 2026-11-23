@@ -337,7 +337,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 ### Phase 2 — System sources, man parsing, subcommands
 
-- [ ] T-2.1 `leva.sources` (A): SystemInfo, ExecutableScanner, origin mapping
+- [x] T-2.1 `leva.sources` (A): SystemInfo, ExecutableScanner, origin mapping
 - Files: `src/leva/sources/{__init__.py,_system.py,_executables.py,_origin.py}`, `tests/unit/test_sources_executables.py`, `tests/unit/test_sources_system.py`.
 - Refs: DITS §5; ADR-0002 §2; TEST-STRATEGY (sources row, §3); D-004.
 - Steps:
