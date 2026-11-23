@@ -1,0 +1,17 @@
+These are the tool commands used in several situations:
+
+Main Porcelain Commands
+   add        Stage files for the next record
+   commit     Record staged work as a revision
+
+External commands
+   frobnicate
+   zap
+
+Command aliases
+   co         commit
+   st         status
+
+Plumbing Commands
+   hash-thing    Compute an object id
+   two words here

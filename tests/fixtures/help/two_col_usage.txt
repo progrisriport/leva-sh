@@ -1,0 +1,5 @@
+Usage: prefs [command]
+
+  read                 summary a
+  read <domain>   summary b
+  write <domain> <key> <value>    summary c

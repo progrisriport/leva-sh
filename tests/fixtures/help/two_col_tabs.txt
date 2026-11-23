@@ -1,0 +1,9 @@
+Usage: svcctl <subcommand> <target>
+
+system/[service-name]
+    Targets the system domain.
+
+	bootstrap       Load a service into a domain.
+	print           Show the state of a target.
+  system/[service]   Targets a whole domain.
+	kickstart       Start a service now. Kill a running one first.

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from leva.manparse._builtins import BuiltinDoc, extract_builtins
 from leva.manparse._definitions import DefinitionItem, definition_items
+from leva.manparse._name import first_sentence
 from leva.manparse._overstrike import strip_overstrike
 from leva.manparse._render import MandocRenderer, ManRenderer
 from leva.manparse._sections import ParsedMan, parse_man
@@ -17,6 +18,7 @@ __all__ = [
     "ParsedMan",
     "definition_items",
     "extract_builtins",
+    "first_sentence",
     "parse_man",
     "read_man_source",
     "strip_overstrike",

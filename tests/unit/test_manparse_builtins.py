@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from leva.manparse import BuiltinDoc, ParsedMan, extract_builtins, parse_man
+from leva.manparse import BuiltinDoc, ParsedMan, extract_builtins, first_sentence, parse_man
 
 FIXTURES = Path(__file__).parent.parent / "fixtures" / "man"
 HEADER = "LEVA-T(1)        General Commands Manual        LEVA-T(1)"
@@ -135,6 +135,19 @@ def test_summary_is_the_first_sentence_only() -> None:
 )
 def test_summary_heuristic(description: str, expected: str) -> None:
     assert _single(description)[0].summary == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("Lists things. More text.", "Lists things."),
+        ("no end here\n  wrapped", "no end here wrapped"),
+        ("a" * 250, "a" * 200),
+        ("", ""),
+    ],
+)
+def test_first_sentence(text: str, expected: str) -> None:
+    assert first_sentence(text) == expected
 
 
 def test_summary_spans_wrapped_lines() -> None:

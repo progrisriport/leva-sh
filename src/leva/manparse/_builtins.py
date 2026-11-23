@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 
 from leva.manparse._definitions import DefinitionItem, definition_items
-from leva.manparse._name import MAX_SUMMARY, is_name
+from leva.manparse._name import MAX_SUMMARY, first_sentence, is_name
 from leva.manparse._sections import ParsedMan
-
-_SENTENCE = re.compile(r"(.+?[.!?])(?=\s|$)")
 
 
 @dataclass(frozen=True, slots=True)
@@ -74,7 +71,7 @@ def _docs(item: DefinitionItem) -> list[BuiltinDoc]:
     """Return one doc per distinct first token of `item`'s terms; none without a description."""
     if not item.description.strip():
         return []
-    summary = _summary(item.description)
+    summary = first_sentence(item.description)
     names = dict.fromkeys(term.split()[0] for term in item.terms)
     return [
         BuiltinDoc(
@@ -85,14 +82,3 @@ def _docs(item: DefinitionItem) -> list[BuiltinDoc]:
         )
         for name in names
     ]
-
-
-def _summary(description: str) -> str:
-    """Return the first sentence of `description` on one line, cut to 200 characters.
-
-    A sentence ends at ``.``, ``!`` or ``?`` followed by whitespace or the end, so an
-    abbreviation such as ``e.g.`` ends it early; without an end the whole text is used.
-    """
-    flat = " ".join(description.split())
-    match = _SENTENCE.match(flat)
-    return (match.group(1) if match else flat)[:MAX_SUMMARY].rstrip()

@@ -7,6 +7,7 @@ from typing import Final
 
 MAX_SUMMARY: Final = 200
 _SEPARATOR: Final = re.compile(r"\s+(?:--|-|\u2013|\u2014)\s+")
+_SENTENCE: Final = re.compile(r"(.+?[.!?])(?=\s|$)")
 
 
 def is_name(value: str) -> bool:
@@ -39,6 +40,25 @@ def parse_name(body: str, name_hint: str) -> tuple[tuple[str, ...], str]:
     )
     names = _names(names_part)
     return (names or (name_hint,)), summary[:MAX_SUMMARY].rstrip()
+
+
+def first_sentence(text: str) -> str:
+    """Return the first sentence of `text` on one line, cut to `MAX_SUMMARY` characters.
+
+    A sentence ends at ``.``, ``!`` or ``?`` followed by whitespace or the end, so an
+    abbreviation such as ``e.g.`` ends it early; without an end the whole text is used.
+
+    Post: one line of at most `MAX_SUMMARY` characters, right-stripped; empty for blank `text`.
+
+    Args:
+        text: Prose that may span several lines.
+
+    Returns:
+        The first sentence, whitespace-flattened.
+    """
+    flat = " ".join(text.split())
+    match = _SENTENCE.match(flat)
+    return (match.group(1) if match else flat)[:MAX_SUMMARY].rstrip()
 
 
 def _names(part: str) -> tuple[str, ...]:

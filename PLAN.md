@@ -418,8 +418,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
     - sorted and unique.
 - Accept: `uv run pytest tests/unit/test_manparse_builtins.py -q`; coverage of `manparse` ≥90%; `make check`.
 
-- [ ] T-2.7 `leva.subcmd`: extractors and merge
-- Files: `src/leva/subcmd/{__init__.py,_hyphen.py,_section_list.py,_help_text.py,_merge.py}`, `tests/unit/test_subcmd.py`, `tests/fixtures/help/*.txt` (synthetic two-col, git-list, brew-commands).
+- [x] T-2.7 `leva.subcmd`: extractors and merge
+- Files: `src/leva/subcmd/{__init__.py,_types.py,_hyphen.py,_section_list.py,_help_text.py,_merge.py}`, `src/leva/manparse/{_name.py,_builtins.py,__init__.py}` (`first_sentence`), `tests/unit/test_subcmd.py`, `tests/unit/test_manparse_builtins.py`, `tests/fixtures/help/*.txt` (synthetic two-col, git-list, brew-commands).
 - Refs: DITS §7; ADR-0002 §6; D-008.
 - Steps:
   - `SubcommandExtractor` Protocol `extract(parent, parsed, known: Mapping[str, KnownPage])`.

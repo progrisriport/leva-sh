@@ -1,0 +1,9 @@
+==> Built-in commands
+--cache
+--version
+analytics
+install
+not a name
+
+==> External commands
+frob

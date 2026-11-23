@@ -1,0 +1,11 @@
+Usage:  toolctl <verb> <options>
+        toolctl <verb> with no options prints the verb usage.
+
+Verbs:
+   list                 (List the items of a volume)
+   info[rmation]        (Show the details of an item)
+   eraseDisk            (Wipe a whole disk)
+   mount <volume>       (Attach a volume to the tree)
+   Info                 (Capitalised names are dropped)
+
+For more help run toolctl <verb> without arguments.
