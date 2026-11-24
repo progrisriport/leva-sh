@@ -434,8 +434,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 ### Phase 3 — Content layer
 
-- [ ] T-3.1 `leva.content` (A): schema types and validation
-- Files: `src/leva/content/{__init__.py,_schema.py,_validate.py,_policy.py}`, `tests/unit/test_content_validate.py`.
+- [x] T-3.1 `leva.content` (A): schema types and validation
+- Files: `src/leva/content/{__init__.py,_schema.py,_validate.py,_policy.py}`, `tests/unit/test_content_{validate,policy,schema}.py`.
 - Refs: DITS §8; ADR-0004; D-010, D-016; D-030 (`Example.danger`); D-033 (`Example.cmd` invariants)
 - Steps:
   - Dataclasses: CuratedCommand, ExampleSpec, VerifySpec, HelpProbe(args, profile), TldrPage, TldrExample; `ContentRecord = CuratedCommand | TldrPage`.

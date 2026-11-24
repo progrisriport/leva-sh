@@ -170,3 +170,10 @@
 - For T-6.6/curated content: `a | b` alternatives keep only the first token and launchctl `LEGACY SUBCOMMANDS` is not scanned; curated content must supply `bootout`, `list`, `load`, ... if wanted.
 - Not run: `make py311` (tool permission); 3.11 compatibility checked by reading.
 - Reviewer round 1: CHANGES (F-5 wrongly "kept on purpose", mirror property test, note gaps); round 2: approved with note wording fixes only.
+
+## 2026-11-24T03:13:13Z T-3.1 `leva.content` (A): schema types and validation — DONE
+- `leva.content`: `CuratedCommand`, `ExampleSpec(.to_example)`, `VerifySpec` (read-only `bind`, unhashable), `HelpProbe(args, profile)`, `TldrPage(.to_examples)`, `TldrExample`, `ContentRecord`, `VERIFY_MODES`, `HELP_PROFILES` (own copy, test checks equal to subcmd), `TLDR_PLATFORMS`, `EXEC_DENYLIST`, `is_destructive`, `validate_command`. D-045 records messages, type strictness, tokenization and destructive rules. 100% branch coverage.
+- For T-3.2: call `validate_command(data, file)` with the label `commands/<file>.yaml` (stem = name); it raises only `ContentError` (hint None). Cross-file example-id uniqueness, duplicate YAML keys and tldr cmd filtering (drop examples whose cmd breaks D-033 before building `TldrPage`) are the provider's job.
+- For T-7.x (verify): `simple_commands` lives in `leva.content._policy` (private); exec denylist is checked on `cmd` and `setup` command words; `bind` holds exactly the placeholders of `cmd`.
+- Known policy gaps (D-045 limitations): `sh -c '...'`, backticks, functions, aliases not seen; `command -v rm` is a false positive (`command` unwraps like a wrapper), so such an example needs a `danger` or a different form.
+- Reviewer fixes: a quoted empty word `''` was treated as a separator (`rm '' x` emitted `('x',)`, `git push '' -f` was missed); `find ... \; -delete` was missed (the part after an escaped `;` now gets the find rule); `git push origin +main` is destructive; Hypothesis top-level replacement now covers every top-level key. D-045 text updated.
