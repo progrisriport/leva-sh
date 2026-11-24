@@ -194,3 +194,10 @@
 - For T-7.3: `stdout_regex` examples are written to hold under `re.search`, `match` and `fullmatch`; pick one and record it.
 - Not run: `make py311` (tool permission); 3.11 compatibility checked by reading.
 - Reviewer round 1: approved with F-5/F-6 fixed by the reviewer and the F-1 tests tightened to exact messages.
+
+## 2026-11-24T23:25:00Z T-4.1 `leva.store` (A): schema, IndexWriter, open_readonly — DONE
+- `leva.store`: `SCHEMA_VERSION` (1), `NewEntry`, `IndexWriter`, `open_readonly`; schema v1 in `migrations/0001_init.sql` loaded by `_schema.load_migrations` (`order_migrations` checks `NNNN_<slug>.sql`, numbers 1..n). D-047 records tables, messages and checks. Store branch coverage 99.1% (only the defensive `lastrowid is None` branch is uncovered).
+- For T-4.2: writer state is `_entered` (bool, set once) and `_conn` (`sqlite3.Connection | None`, set by `__enter__`, cleared at the start of `__exit__`); `_connection()` raises `ValueError("index writer is not open")` and `_writing()` maps errors, so `finalize()` should run through `_writing()` inside the one transaction opened by `executescript("BEGIN;...")` (`isolation_level=None`: never call `conn.commit()`; `__exit__` sends `COMMIT`).
+- For T-4.4/T-6.5: the example text column is `description` (not `desc`); child tables are keyed `(entry_id, ord)`; `entry.has_man`/`curated` are 0/1; `kind`/`origin` are enum values; `alias` has no `ord` (read it `ORDER BY alias`).
+- For T-6.x (ingest): call each list method once per entry; a failed write leaves the rows of that call already accepted in the transaction (`executemany` is not atomic per call), so let `IngestError` propagate and remove the rolled-back `.new` file (it exists with `user_version` 0).
+- Reviewer fixes: a lone surrogate in any text leaked a raw `UnicodeEncodeError` from writes; now mapped to `IngestError("cannot write index: ...")`, with tests for it and for a non-integrity `sqlite3.Error`; D-047 amended; inline test import moved to the top; ticked PLAN (`_schema.py` added to Files) and wrote this entry (the executor had left both undone).

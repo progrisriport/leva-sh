@@ -469,8 +469,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 ### Phase 4 — Index storage and repository
 
-- [ ] T-4.1 `leva.store` (A): schema, IndexWriter, open_readonly
-- Files: `src/leva/store/{__init__.py,_writer.py,_open.py}`, `src/leva/store/migrations/0001_init.sql`, `tests/unit/test_store_writer.py`.
+- [x] T-4.1 `leva.store` (A): schema, IndexWriter, open_readonly
+- Files: `src/leva/store/{__init__.py,_schema.py,_writer.py,_open.py}`, `src/leva/store/migrations/0001_init.sql`, `tests/unit/test_store_writer.py`.
 - Refs: DITS §9; ADR-0003; D-006; D-029; D-030.
 - Steps:
   - Schema v1 per DITS plus the D-006 changes: `entry.rank`, the null-safe unique index, `subcommand.body`, indexes on alias/name.
