@@ -1,0 +1,108 @@
+schema: 1
+kind: command
+name: ls
+section: "1"
+summary: Show what a folder contains, with options for hidden files, sizes and sort order.
+explain: >-
+  ls prints the names of the files and folders inside a directory, or the name of each file
+  you pass to it. Without arguments it looks at the current directory. Add -l for one detailed
+  line per entry, -A to include names that start with a dot, and -t or -S to change the order.
+  Output goes in columns on a terminal and one name per line when it is piped.
+intents:
+  - list files in a folder
+  - show hidden files
+  - show file sizes
+  - sort files by modification time
+  - sort files by size
+  - list a folder recursively
+  - see which entries are folders
+tags:
+  - files
+  - folders
+  - listing
+notes:
+  - kind: bsd-gnu
+    text: >-
+      macOS ls is the BSD one, not GNU coreutils. Colour is switched on with -G (or
+      --color=auto), and GNU-only options such as --group-directories-first do not exist.
+  - kind: macos
+    text: >-
+      -@ adds extended attribute names and sizes to the long format, and -O adds file flags.
+      Both only show up together with -l.
+examples:
+  - id: ls-one-per-line
+    desc: List a folder with one name per line
+    cmd: ls -1 {{directory}}
+    verify:
+      mode: exec
+      setup: mkdir d && touch d/b d/a
+      bind:
+        directory: d
+      stdout_regex: '^a\nb\n$'
+  - id: ls-hidden
+    desc: Include names that start with a dot
+    cmd: ls -A {{directory}}
+    verify:
+      mode: exec
+      setup: mkdir d && touch d/.hidden d/shown
+      bind:
+        directory: d
+      stdout_contains:
+        - .hidden
+        - shown
+  - id: ls-classify
+    desc: Mark folders with a trailing slash
+    cmd: ls -F {{directory}}
+    verify:
+      mode: exec
+      setup: mkdir -p d/sub && touch d/file
+      bind:
+        directory: d
+      stdout_contains:
+        - sub/
+        - file
+  - id: ls-recursive
+    desc: List a folder and everything below it
+    cmd: ls -R {{directory}}
+    verify:
+      mode: exec
+      setup: mkdir -p d/sub && touch d/sub/inner
+      bind:
+        directory: d
+      stdout_contains:
+        - "d/sub:"
+        - inner
+  - id: ls-long
+    desc: Show permissions, owner, size and date for each entry
+    cmd: ls -l {{directory}}
+    verify:
+      mode: exec
+      setup: mkdir d && touch d/a
+      bind:
+        directory: d
+      stdout_contains:
+        - total
+        - a
+  - id: ls-human-sizes
+    desc: Show sizes in K, M or G units
+    cmd: ls -lh {{directory}}
+    verify:
+      mode: static
+      reason: The sizes, owners and dates depend on the machine.
+  - id: ls-newest-first
+    desc: Put the most recently changed entries first
+    cmd: ls -lt {{directory}}
+    verify:
+      mode: static
+      reason: The order depends on file timestamps.
+  - id: ls-largest-first
+    desc: Put the biggest entries first
+    cmd: ls -lhS {{directory}}
+    verify:
+      mode: static
+      reason: The order depends on file sizes.
+related:
+  - find
+  - stat
+  - du
+  - file

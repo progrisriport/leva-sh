@@ -452,7 +452,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Each rule has a negative test.
 - Accept: `uv run pytest tests/unit/test_content_validate.py -q`; `make check`.
 
-- [ ] T-3.2 `leva.content` (B): providers, content_version, attribution, first real YAML
+- [x] T-3.2 `leva.content` (B): providers, content_version, attribution, first real YAML
 - Files: `src/leva/content/{_yaml_provider.py,_tldr_provider.py,_version.py}`, `src/leva/content/commands/ls.yaml`, `src/leva/content/ATTRIBUTION.md` (initial: curated content CC BY 4.0; the tldr section is added in T-7.2), `tests/fixtures/content/**`, `tests/fixtures/tldr/*.jsonl`, `tests/unit/test_content_providers.py`, `tests/integration/test_content_real.py`.
 - Refs: DITS §8; ADR-0004 §4; TEST-STRATEGY (content row); D-017.
 - Steps:

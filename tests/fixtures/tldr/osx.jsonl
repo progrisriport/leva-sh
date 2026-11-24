@@ -1,0 +1,1 @@
+{"name": "beta", "platform": "osx", "description": "Mac beta.", "examples": [{"desc": "Run beta on macOS", "cmd": "beta --mac"}]}

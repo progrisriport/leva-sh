@@ -1,0 +1,14 @@
+schema: 1
+kind: command
+name: alpha
+section: "1"
+summary: Print a synthetic greeting.
+explain: Alpha is a made-up command used by the provider tests.
+intents:
+  - say hello
+examples:
+  - id: alpha-hello
+    desc: Print the greeting
+    cmd: alpha
+    verify:
+      mode: static

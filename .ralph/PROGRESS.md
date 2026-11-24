@@ -177,3 +177,12 @@
 - For T-7.x (verify): `simple_commands` lives in `leva.content._policy` (private); exec denylist is checked on `cmd` and `setup` command words; `bind` holds exactly the placeholders of `cmd`.
 - Known policy gaps (D-045 limitations): `sh -c '...'`, backticks, functions, aliases not seen; `command -v rm` is a false positive (`command` unwraps like a wrapper), so such an example needs a `danger` or a different form.
 - Reviewer fixes: a quoted empty word `''` was treated as a separator (`rm '' x` emitted `('x',)`, `git push '' -f` was missed); `find ... \; -delete` was missed (the part after an escaped `;` now gets the find rule); `git push origin +main` is destructive; Hypothesis top-level replacement now covers every top-level key. D-045 text updated.
+
+## 2026-11-24T03:21:14Z T-3.2 `leva.content` (B): providers, content_version, attribution, first real YAML — DONE
+- `leva.content`: `ContentProvider` port, `CuratedYamlProvider(root)` (strict `SafeLoader` subclass rejecting duplicate keys, `.yml` rejected, cross-file example ids, all-or-nothing), `TldrSnapshotProvider(root)` (JSONL, exact keys, `platform` = file stem, osx replaces common), `content_version(root)`, `default_root()`, `attribution_text()`. D-046 records file rules, messages and the hash recipe. 100% branch coverage.
+- First curated file `commands/ls.yaml` (8 examples: 5 exec, 3 static); notes checked against `mandoc -T ascii /usr/share/man/man1/ls.1`. `ATTRIBUTION.md` initial (the tldr section is T-7.2's).
+- For T-6.x: ingest calls `CuratedYamlProvider(default_root())`, `TldrSnapshotProvider(default_root())`, `content_version(default_root())`; all raise only `ContentError`.
+- For T-7.2: `tools/vendor_tldr.py` must write one JSON object per line with exactly `name`, `platform`, `description`, `examples: [{desc, cmd}]`, `platform` equal to the file stem, no duplicate names per file, and must add `tldr/SOURCE.json` (it feeds `content_version`). Invalid example cmds are dropped with a WARNING, not an error.
+- For T-7.3/T-7.4: `ls-one-per-line` uses `stdout_regex: '^a\nb\n$'` (works with `re.search`, `match` or `fullmatch`); the `ls -l` example only checks `total` because macOS may add `@` (xattrs) to fresh files.
+- Strictness note: YAML merge keys (`<<`) count as duplicates when an explicit key overrides a merged one; curated files should not use merge keys.
+- Reviewer fixes: `ls-one-per-line` verify tightened from `stdout_contains: [a, b]` (always true) to an exact regex; D-046 JSON error wording made exact (a repeated key has its own message).

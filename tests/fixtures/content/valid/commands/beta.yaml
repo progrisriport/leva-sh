@@ -1,0 +1,15 @@
+schema: 1
+kind: command
+name: beta
+summary: Print a second synthetic greeting.
+explain: Beta is another made-up command used by the provider tests.
+intents:
+  - say goodbye
+examples:
+  - id: beta-bye
+    desc: Print the farewell
+    cmd: beta {{name}}
+    verify:
+      mode: exec
+      bind:
+        name: world
