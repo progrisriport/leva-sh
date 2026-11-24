@@ -10,7 +10,23 @@ Textual; the CLI command is `leva`.
 
 ## Status
 
-Early design — not usable yet.
+In development — not usable yet (no TUI or `leva` command so far).
+Last updated 2026-11-24: 24 of 97 planned tasks done.
+
+| Phase | Scope | State |
+|---|---|---|
+| 0 | Foundations, conventions, spikes | done |
+| 1 | Domain types, placeholders, paths, clipboard, config | done |
+| 2 | System sources, man page parsing, subcommands | done |
+| 3 | Curated content: schema, validation, loaders | in progress (review left) |
+| 4 | Index storage (SQLite + FTS5) and repository | planned |
+| 5 | Search and library | planned |
+| 6 | Ingest (building the index from this Mac) | planned |
+| 7 | Example verification and first curated commands | planned |
+| 8 | TUI | planned |
+| 9 | CLI and `doctor` | planned |
+| 10 | Curated content expansion | planned |
+| 11 | Performance, robustness, polish | planned |
 
 ## Install (planned)
 
