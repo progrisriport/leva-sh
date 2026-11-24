@@ -8,6 +8,10 @@ and a local index of the man pages already installed on your machine.
 Recipes are planned for v1.x and tutorials for v2. Built with Python and
 Textual; the CLI command is `leva`.
 
+Leva is a vibecoded app: it is built with AI assistance, with the aim of
+sparing us needless effort, like digging through man pages or searching the
+web for the right flags, so attention goes to the work that matters.
+
 ## Status
 
 In development — not usable yet (no TUI or `leva` command so far).
