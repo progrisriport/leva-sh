@@ -80,9 +80,7 @@ examples:
       setup: mkdir d && touch d/a
       bind:
         directory: d
-      stdout_contains:
-        - total
-        - a
+      stdout_regex: '^total [0-9]+\n[^\n]* a\n$'
   - id: ls-human-sizes
     desc: Show sizes in K, M or G units
     cmd: ls -lh {{directory}}

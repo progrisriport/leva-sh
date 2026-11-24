@@ -121,6 +121,8 @@ def _parse(text: str, label: str) -> object:
         mark = exc.problem_mark if isinstance(exc, yaml.MarkedYAMLError) else None
         where = f" at line {mark.line + 1}" if mark is not None else ""
         raise ContentError(f"{label}: invalid YAML{where}") from exc
+    except (ValueError, RecursionError) as exc:  # constructors: bad dates, long ints; deep nesting
+        raise ContentError(f"{label}: invalid YAML") from exc
 
 
 def _check_ids(command: CuratedCommand, label: str, owners: dict[str, str]) -> None:

@@ -712,6 +712,30 @@ def test_file_label_is_used_in_messages() -> None:
     assert error_of(None, "x/tar.yaml").message == "x/tar.yaml: expected a mapping"
 
 
+HUGE = 10**5000  # `repr` and `str` of an int this long raise ValueError
+HIDDEN = "<integer too large to show>"
+
+
+def test_over_long_integers_are_reported_not_raised() -> None:
+    assert error_of(valid_doc(schema=HUGE)).message == (
+        f"{FILE}:schema: unsupported schema {HIDDEN} (expected 1)"
+    )
+    assert error_of({**valid_doc(), HUGE: 1}).message == f"{FILE}: unknown key {HIDDEN}"
+    assert error_of({**valid_doc(), (1, HUGE): 1}).message == f"{FILE}: unknown key {HIDDEN}"
+    verify = {"mode": "exec", "bind": {"archive": "a", HUGE: "b"}}
+    message = error_of(valid_doc(examples=[example(verify=verify)])).message
+    assert message == f"{FILE}:examples[0].verify.bind: unknown placeholder {HIDDEN}"
+    verify = {"mode": "exec", "bind": {"archive": "a", HUGE: 1}}
+    message = error_of(valid_doc(examples=[example(verify=verify)])).message
+    assert message == f"{FILE}:examples[0].verify.bind.{HIDDEN}: must be a string"
+
+
+def test_non_string_bind_keys_are_reported_not_raised() -> None:
+    verify = {"mode": "exec", "bind": {"archive": "a", 7: 1}}
+    message = error_of(valid_doc(examples=[example(verify=verify)])).message
+    assert message == f"{FILE}:examples[0].verify.bind.7: must be a string"
+
+
 def test_validation_does_not_mutate_the_input() -> None:
     data = full_doc()
     snapshot = copy.deepcopy(data)
@@ -719,10 +743,22 @@ def test_validation_does_not_mutate_the_input() -> None:
     assert data == snapshot
 
 
+def _too_long(number: int) -> int:
+    return number << 20_000
+
+
 JSON_LIKE = st.recursive(
-    st.none() | st.booleans() | st.integers() | st.floats() | st.text(max_size=12),
+    st.none()
+    | st.booleans()
+    | st.integers()
+    | st.integers().map(_too_long)
+    | st.floats()
+    | st.text(max_size=12),
     lambda inner: (
-        st.lists(inner, max_size=4) | st.dictionaries(st.text(max_size=8), inner, max_size=4)
+        st.lists(inner, max_size=4)
+        | st.dictionaries(
+            st.text(max_size=8) | st.integers() | st.integers().map(_too_long), inner, max_size=4
+        )
     ),
     max_leaves=12,
 )

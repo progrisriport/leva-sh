@@ -146,9 +146,12 @@ def _inner(argv: Argv) -> Iterator[Argv]:
 
 
 def _expand(argv: Argv) -> Iterator[Argv]:
-    yield argv
-    for inner in _inner(argv):
-        yield from _expand(inner)
+    """Yield `argv`, then every inner command depth first (iterative: chains may be deep)."""
+    pending = [argv]
+    while pending:
+        current = pending.pop()
+        yield current
+        pending.extend(reversed(list(_inner(current))))
 
 
 def simple_commands(cmd: str) -> list[Argv]:

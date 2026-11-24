@@ -186,3 +186,11 @@
 - For T-7.3/T-7.4: `ls-one-per-line` uses `stdout_regex: '^a\nb\n$'` (works with `re.search`, `match` or `fullmatch`); the `ls -l` example only checks `total` because macOS may add `@` (xattrs) to fresh files.
 - Strictness note: YAML merge keys (`<<`) count as duplicates when an explicit key overrides a merged one; curated files should not use merge keys.
 - Reviewer fixes: `ls-one-per-line` verify tightened from `stdout_contains: [a, b]` (always true) to an exact regex; D-046 JSON error wording made exact (a repeated key has its own message).
+
+## 2026-11-24T23:08:15Z T-3.R Phase 3 review (RC) — DONE
+- Note `docs/design/leva-sh/reviews/phase-3.md`: RC 1–10 ok; F-1..F-6 fixed. F-1: over-long YAML ints (>4300 digits) in messages shown as `<integer too large to show>`; F-2: YAML constructor `ValueError`/`RecursionError` → `<label>: invalid YAML`; F-5: `_policy._expand` iterative (deep wrapper chains leaked `RecursionError`); F-6: `ls-long` verify now `stdout_regex: '^total [0-9]+\n[^\n]* a\n$'` (old `stdout_contains: a` was vacuous).
+- D-045 amendments: TEST-STRATEGY "distruttivo mai in exec" = D-016 denylist + D-030 `danger` + sandbox (exec of `rm` on a setup fixture allowed); known `is_destructive` gaps listed (`mv`/`cp`/`>` overwrite, `shred`, `truncate`, `git checkout .`, `sh -c`). D-046: lone surrogates pass validation (limitation).
+- R10 edits: T-6.1 (`content_version(default_root())`), T-6.4 (providers, `to_example`, `to_examples`, `HelpProbe`), T-7.2 (exact JSONL format; `SOURCE.json` must change with any JSONL change), T-7.3 (`VerifySpec` fields), T-7.4 (export and reuse `simple_commands`), T-9.3 (both providers drain).
+- For T-7.3: `stdout_regex` examples are written to hold under `re.search`, `match` and `fullmatch`; pick one and record it.
+- Not run: `make py311` (tool permission); 3.11 compatibility checked by reading.
+- Reviewer round 1: approved with F-5/F-6 fixed by the reviewer and the F-1 tests tightened to exact messages.

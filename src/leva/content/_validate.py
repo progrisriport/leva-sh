@@ -67,6 +67,14 @@ _UNSPLITTABLE: Final = "cannot be split into words (unbalanced quote or trailing
 _MISSING: Final = object()
 
 
+def _show(value: object) -> str:
+    """Return ``repr(value)``; an integer too long for the interpreter limit gets a stand-in."""
+    try:
+        return repr(value)
+    except ValueError:  # int -> str conversion limit (4300 digits), also inside a tuple key
+        return "<integer too large to show>"
+
+
 @dataclass(frozen=True, slots=True)
 class _At:
     """A location in the document, used to build ``file:path: reason`` messages."""
@@ -75,7 +83,8 @@ class _At:
     path: str = ""
 
     def key(self, name: object) -> _At:
-        return _At(self.file, f"{self.path}.{name}" if self.path else str(name))
+        text = name if isinstance(name, str) else _show(name)
+        return _At(self.file, f"{self.path}.{text}" if self.path else text)
 
     def item(self, index: int) -> _At:
         return _At(self.file, f"{self.path}[{index}]")
@@ -93,7 +102,7 @@ class _Fields:
             raise at.fail("must be a mapping")
         for key in value:
             if key not in allowed:
-                raise at.fail(f"unknown key {key!r}")
+                raise at.fail(f"unknown key {_show(key)}")
         self.at = at
         self._data: dict[object, object] = value
 
@@ -192,7 +201,9 @@ def _check_header(at: _At, data: object) -> dict[object, object]:
         raise at.key("schema").fail("required")
     schema = data["schema"]
     if type(schema) is not int or schema != _SCHEMA_VERSION:
-        raise at.key("schema").fail(f"unsupported schema {schema!r} (expected {_SCHEMA_VERSION})")
+        raise at.key("schema").fail(
+            f"unsupported schema {_show(schema)} (expected {_SCHEMA_VERSION})"
+        )
     if "kind" not in data:
         raise at.key("kind").fail("required")
     kind = _string(at.key("kind"), data["kind"])
@@ -357,7 +368,7 @@ def _bind(fields: _Fields, cmd: str) -> dict[str, str]:
             raise at.fail(f"missing placeholder {name!r}")
     for key in texts:
         if key not in wanted:
-            raise at.fail(f"unknown placeholder {key!r}")
+            raise at.fail(f"unknown placeholder {_show(key)}")
     return {name: texts[name] for name in wanted}
 
 

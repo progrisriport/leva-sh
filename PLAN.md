@@ -464,7 +464,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - The integration test loads every real file.
 - Accept: `uv run pytest tests/unit/test_content_providers.py tests/integration/test_content_real.py -q`; coverage of `content` ≥90%; `make check`.
 
-- [ ] T-3.R Phase 3 review (RC)
+- [x] T-3.R Phase 3 review (RC)
 - Accept: review note; `make check`.
 
 ### Phase 4 — Index storage and repository
@@ -573,7 +573,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Steps:
   - `Staleness` enum.
   - `Fingerprint(version_part, system_part)`:
-    - version part = leva version, content_version, schema;
+    - version part = leva version, `content_version(default_root())` from `leva.content` (D-046), schema;
     - system part = macOS version and build, per-dir (count, max mtime) for man and bin dirs, config digest.
   - Stored in meta.
   - `staleness(index_db)`: missing or unreadable → MISSING; version mismatch → VERSION_CHANGED; system mismatch → SYSTEM_CHANGED; else FRESH.
@@ -607,8 +607,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Refs: D-005, D-008, D-009, D-011, D-017, D-021, D-030.
 - Steps:
   - Subcommands: run the extractors chain per entry, plus probes declared by curated `help_probe` (allowlist `{name: (str(first_executable.path), *help_probe.args)}` built from curated content + scanned executables; catch `IngestError` per probe and continue), then merge with `merge_subcommands([curated, probe, section, hyphen])` (D-044); `known` is `{entry.name: KnownPage(name, summary, synopsis_body)}` over all man-backed entries (`""` when no SYNOPSIS); curated `Subcommand.source` is `"curated"`.
-  - Curated attachment: explain, intents, notes, examples (each with its `danger`, D-030), related (only names that resolve), subcommands; `curated` flag; re-rank.
-  - tldr attachment.
+  - Curated attachment: explain, intents, notes, examples (each with its `danger`, D-030), related (only names that resolve), subcommands; `curated` flag; re-rank. Records come from `CuratedYamlProvider(default_root()).load()`; an example becomes `spec.to_example()` (source `curated`, `verified` = verify mode, `danger` kept); the probe allowlist and the `HelpTextExtractor` profile come from `command.help_probe.args` and `.profile` (`HelpProbe`, D-045).
+  - tldr attachment: `TldrSnapshotProvider(default_root()).load()` yields one `TldrPage` per name (osx already replaced common); examples are `page.to_examples()` (ids `<name>-tldr-<n>`, source `tldr`, verified `none`, D-017).
   - Curated commands that are not installed are skipped and reported.
 - Accept: `uv run pytest tests/unit/test_ingest_enrich.py -q`; `make check`.
 
@@ -670,6 +670,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - ATTRIBUTION.md: tldr-pages, CC BY 4.0, tag and sha, list of changes.
   - Licence test: ATTRIBUTION mentions tldr-pages and the SOURCE.json tag.
   - Run the tool once (network allowed only here).
+  - The provider (D-046) rejects any JSONL line that is not exactly `{name, platform, description, examples: [{desc, cmd}]}` with string values, a `platform` different from the file stem, or a second page with the same name in one file; example commands that break the D-033 invariants are dropped with a warning. `content_version` hashes `SOURCE.json` and not the JSONL files, so any change of the JSONL output, also a converter change at the same tag, must change `SOURCE.json` (record a converter revision in it).
 - Accept: `uv run pytest tests/unit/test_vendor_tldr.py tests/unit/test_attribution.py tests/integration/test_content_real.py -q`; `make check`.
 
 - [ ] T-7.3 `leva.verify` (A): sandbox and exec mode
@@ -686,6 +687,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
     - assertions: exit code, stdout_contains/regex, files_exist; unbound placeholder → fail;
     - `min_macos` greater than the current version → skip.
   - skip mode returns the reason.
+  - Input is `leva.content.VerifySpec` (`mode`, `setup`, read-only `bind`, `expect_exit`, `stdout_contains`, `stdout_regex`, `files_exist` as sandbox-relative paths, `reason`, `min_macos`) via `ExampleSpec`; validation (D-045) already guarantees `bind` holds exactly the placeholders of `cmd`, so "unbound placeholder → fail" is a defensive check for hand-built specs.
   - Tests: HOME isolation; a write outside the sandbox is denied and the outside file does not exist; TCP connect to a test-owned 127.0.0.1 listener is denied (`@pytest.mark.enable_socket`); timeout; bind missing.
 - Accept: `uv run pytest tests/unit/test_verify_exec.py -q`; `make check`.
 
@@ -693,7 +695,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Files: `src/leva/verify/{_static.py,_report.py,__main__.py}`, `tests/unit/test_verify_static.py`, `tests/unit/test_verify_cli.py`, `tests/live/test_curated_examples.py`, `tests/live/test_tldr_static_report.py`, `docs/CONTENT-GUIDE.md`, Makefile `verify`.
 - Refs: DITS §16; D-016, D-017.
 - Steps:
-  - static mode:
+  - static mode (`leva.content` already owns `EXEC_DENYLIST` and the lexical tokenizer `simple_commands` in `_policy`, which is not exported: export it from the package root and reuse it instead of a second copy; it also handles wrappers and `find -exec`):
     - `shlex.split` of the plain command; split at pipes and command separators;
     - each program must exist in the index or in the standard PATH dirs;
     - each flag must appear in the entry's man/help text (short clusters split into single flags; long flags compared before `=`).
@@ -854,7 +856,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 - Files: `src/leva/cli/_doctor.py`, `tests/integration/test_doctor.py`.
 - Refs: FR-20; DITS §15; D-015.
 - Steps:
-  - Checks: Python, SQLite/FTS5, mandoc, manpath, pbcopy, content loads, index present/fresh/counts, versions.
+  - Checks: Python, SQLite/FTS5, mandoc, manpath, pbcopy, content loads (both `CuratedYamlProvider(default_root()).load()` and `TldrSnapshotProvider(default_root()).load()` drain without `ContentError`), index present/fresh/counts, versions.
   - Plain text, one check per line `ok|warn|fail name: detail`; exit 0 if no fail.
   - `--offline` per D-015.
 - Accept: `uv run pytest -m integration tests/integration/test_doctor.py -q`; `LEVA_HOME=$(mktemp -d) uv run leva doctor --offline` exits 0; `make check`.

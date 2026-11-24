@@ -86,6 +86,18 @@ def test_simple_commands_unwraps_nested_wrappers() -> None:
     ]
 
 
+@pytest.mark.parametrize(
+    "cmd",
+    ["nohup " * 2000 + "rm x", "sudo " * 2000 + "rm x", "find . " + "-exec " * 2000 + "rm"],
+    ids=["nohup", "sudo", "find-exec"],
+)
+def test_simple_commands_unwraps_chains_deeper_than_the_recursion_limit(cmd: str) -> None:
+    argvs = simple_commands(cmd)
+    assert len(argvs) == 2001
+    assert argvs[-1][0] == "rm"
+    assert is_destructive(cmd)
+
+
 def test_simple_commands_wrapper_without_command() -> None:
     assert simple_commands("sudo -v") == [("sudo", "-v")]
     assert simple_commands("env") == [("env",)]
@@ -176,6 +188,9 @@ def test_destructive_commands(cmd: str) -> None:
         "echo 'rm -rf /'",
         "man rm",
         "which rm",
+        "echo rm",
+        "grep -r rm .",
+        "ls -lrt",
         "echo hi > rm",
         "dd if=x",
         "dd if=x bs=1m",
