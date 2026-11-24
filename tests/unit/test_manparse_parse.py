@@ -126,7 +126,7 @@ def test_unicode_line_separators_split_lines_without_error() -> None:
 # --- NAME -----------------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("separator", ["-", "--", "\u2013", "\u2014"])
+@pytest.mark.parametrize("separator", ["-", "--", "\N{EN DASH}", "\N{EM DASH}"])
 def test_name_separators(separator: str) -> None:
     parsed = parse_man(_name_page(f"foo {separator} does a thing"), name_hint="hint")
 
@@ -250,6 +250,8 @@ def _valid(**changes: object) -> ParsedMan:
         {"summary": "a\x0bb"},
         {"summary": "trailing newline\n"},
         {"summary": "trailing return\r"},
+        {"summary": "next line\x85"},
+        {"summary": "line" + chr(0x2028) + "separator"},
         {"sections": (Section("A", "", 1),)},
         {"sections": (Section("A", "", 0), Section("B", "", 2))},
         {"sections": (Section("A", "", 1), Section("B", "", 0))},
@@ -322,7 +324,7 @@ MANDOC_LINES = st.lists(
 
 @given(text=TEXT, hint=HINT)
 @example(text="", hint="x")
-@example(text="a\x0cb\x0b\x1c\x85\u2028c", hint="x")
+@example(text="a\x0cb\x0b\x1c\x85\N{LINE SEPARATOR}c", hint="x")
 @example(text="NAME\n     a - b\n\nlast", hint="x")
 def test_parse_man_never_raises_on_arbitrary_text(text: str, hint: str) -> None:
     _check_invariants(parse_man(text, name_hint=hint))

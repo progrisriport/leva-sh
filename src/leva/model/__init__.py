@@ -23,6 +23,7 @@ from leva.model._types import (
     Section,
     Subcommand,
     Verification,
+    is_name,
 )
 
 __all__ = [
@@ -44,4 +45,5 @@ __all__ = [
     "Subcommand",
     "Verification",
     "VerificationError",
+    "is_name",
 ]

@@ -160,3 +160,13 @@
 - For T-6.4: build `known` as `{entry.name: KnownPage(name, summary, synopsis_body)}` over all man-backed entries (`""` synopsis when absent); call `merge_subcommands([curated, probe, section, hyphen])`; curated `Subcommand.source` must be `"curated"`. The hyphen extractor iterates all of `known` per call (only a `startswith` per key).
 - Known limitations: `bootstrap | bootout` yields only `bootstrap`; `info[rmation]` is dropped (not expanded); a two-col summary `(a) and (b)` loses the outer parentheses (literal "starts with `(` and ends with `)`" rule).
 - Reviewer fixes: the 200-char cut test now asserts the exact cut text (it only checked `<= 200`); docstring for the `_probe` helper; ticked PLAN and wrote this entry (the executor had left both undone).
+
+## 2026-11-24T02:50:28Z T-2.R Phase 2 review (RC + live sources smoke) — DONE
+- Note `docs/design/leva-sh/reviews/phase-2.md`: RC 1–10, F-1..F-5 fixed. Live on this Mac: /usr/bin 934 executables, man1 1174 pages, 0 render failures; launchctl 20, ktrace 16, tailspin 8, diskutil 34 subcommands.
+- F-1: the name rule is public once as `leva.model.is_name` (D-033 amendment); `leva.sources._names` is deleted. Use it for any new name check instead of a local copy.
+- F-2: `ProbeRunner.run` wraps temp-dir/capture `OSError` as `IngestError("probe failed: <name>")`. F-3: `ParsedMan.summary` rejects every `str.splitlines` break. F-4: clipboard test helper timeout 10 s.
+- F-5 (D-044 amendment): `SectionListExtractor` skips terms whose first token is `parent` and terms with a sentence end (`[A-Za-z0-9)\]][.!?](?:\s|$)`). Callers must pass the real parent name.
+- For T-6.2..T-6.4: R10 facts added to the PLAN steps (stub check before render, per-page `ManRenderError`, builtins via `extract_builtins`, probe allowlist shape, merge order).
+- For T-6.6/curated content: `a | b` alternatives keep only the first token and launchctl `LEGACY SUBCOMMANDS` is not scanned; curated content must supply `bootout`, `list`, `load`, ... if wanted.
+- Not run: `make py311` (tool permission); 3.11 compatibility checked by reading.
+- Reviewer round 1: CHANGES (F-5 wrongly "kept on purpose", mirror property test, note gaps); round 2: approved with note wording fixes only.

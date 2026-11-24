@@ -32,12 +32,16 @@ class Kind(StrEnum):
     MANPAGE_ONLY = "manpage"
 
 
-def _is_name(value: str) -> bool:
-    return bool(value) and not any(char.isspace() for char in value)
+def is_name(value: str) -> bool:
+    """Tell whether `value` can be an entry, section, example or subcommand name (D-033).
+
+    Post: true exactly when `value` is non-empty and holds no `str.isspace()` character.
+    """
+    return value != "" and not any(char.isspace() for char in value)
 
 
 def _check_name(owner: str, field: str, value: str) -> None:
-    if not _is_name(value):
+    if not is_name(value):
         raise ValueError(f"{owner}.{field} must be non-empty without whitespace: {value!r}")
 
 

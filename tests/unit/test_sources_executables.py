@@ -1,4 +1,4 @@
-"""leva.sources: origin mapping, entry-name rule and ExecutableScanner over tmp trees."""
+"""leva.sources: origin mapping and ExecutableScanner over tmp trees."""
 
 from __future__ import annotations
 
@@ -11,9 +11,6 @@ import pytest
 
 from leva.model import Origin
 from leva.sources import DEFAULT_BIN_DIRS, Executable, ExecutableScanner, origin_for
-from leva.sources._names import is_entry_name
-
-NO_BREAK_SPACE = chr(0xA0)
 
 
 def make_file(directory: Path, name: str, mode: int = 0o755) -> Path:
@@ -42,16 +39,6 @@ def names(scanner: ExecutableScanner) -> list[str]:
 )
 def test_origin_for(path: str, origin: Origin) -> None:
     assert origin_for(Path(path)) is origin
-
-
-@pytest.mark.parametrize("name", ["ls", "[", "[[", ".", ":"])
-def test_is_entry_name_accepts(name: str) -> None:
-    assert is_entry_name(name)
-
-
-@pytest.mark.parametrize("name", ["", "a b", f"a{NO_BREAK_SPACE}b", "a\tb", "a\nb"])
-def test_is_entry_name_rejects(name: str) -> None:
-    assert not is_entry_name(name)
 
 
 def test_default_bin_dirs_follow_d004_order() -> None:

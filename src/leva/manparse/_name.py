@@ -5,14 +5,11 @@ from __future__ import annotations
 import re
 from typing import Final
 
+from leva.model import is_name
+
 MAX_SUMMARY: Final = 200
 _SEPARATOR: Final = re.compile(r"\s+(?:--|-|\u2013|\u2014)\s+")
 _SENTENCE: Final = re.compile(r"(.+?[.!?])(?=\s|$)")
-
-
-def is_name(value: str) -> bool:
-    """Tell whether `value` is a valid entry name: non-empty, no `str.isspace()` character."""
-    return value != "" and not any(char.isspace() for char in value)
 
 
 def parse_name(body: str, name_hint: str) -> tuple[tuple[str, ...], str]:

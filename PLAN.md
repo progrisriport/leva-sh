@@ -429,7 +429,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Negative tests: ssh-keygen is not a subcommand of ssh; `system/[service]` is filtered out; unknown profile raises ValueError.
 - Accept: `uv run pytest tests/unit/test_subcmd.py -q`; `make check`.
 
-- [ ] T-2.R Phase 2 review (RC; plus "live" smoke: `uv run pytest -m macos_live tests/live/test_sources_live.py`. Create that test: /usr/bin has ≥500 executables, `ls` present, man1 renders with ≤2% failures.)
+- [x] T-2.R Phase 2 review (RC; plus "live" smoke: `uv run pytest -m macos_live tests/live/test_sources_live.py`. Create that test: /usr/bin has ≥500 executables, `ls` present, man1 renders with ≤2% failures.)
 - Accept: review note; `make check`; the live test passes.
 
 ### Phase 3 — Content layer
@@ -585,8 +585,9 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Refs: DITS §13; ADR-0002 §3, §8; NFR-12.
 - Steps:
   - Dedup ManFiles per D-005.
-  - Stub detection before rendering.
+  - Stub detection before rendering: `stub_target(read_man_source(path))` (a `ManRenderError` from reading counts as a failure of that page); the raw `.so` argument is resolved against the man root by ingest (D-005, D-040).
   - Render + parse in a `ThreadPoolExecutor(workers)`; results reassembled in input order (deterministic).
+  - Per page, catch `ManRenderError` from `render`/`read_man_source` (the only error `leva.manparse` raises); `parse_man` never raises for valid input; the entry name is `ManFile.name`, and `redirect_to` is set with `dataclasses.replace`.
   - A failure means `progress.warn` + an entry in skipped; more than 20% failures raises `IngestError("man pages unreadable; run leva doctor")`.
   - Cooperative cancel token checked between pages.
   - Tests with a FakeRenderer (random delays, failures).
@@ -597,6 +598,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Refs: D-005 (all rules), FR-2, FR-3.
 - Steps:
   - A pure function that turns pages, executables and builtins into catalog entries with aliases, sections and ranks.
+  - Builtin entries come from `extract_builtins` (zsh and bash pages, D-043): `BuiltinDoc.synopsis` becomes the SYNOPSIS section, `body` the DESCRIPTION, `summary` the entry summary; origins ZSH and BASH.
   - One test per D-005 rule: echo three ways, cd via stub plus builtin, `[` alias, exe-only, an exe attached through an alias, section 1 vs 8, CLT duplicate, Homebrew-first manpath, a stub shadowing a later real page (rsync), a stub whose target is outside the man dirs (Xsan), a stub with a missing target.
 - Accept: `uv run pytest tests/unit/test_ingest_catalog.py -q`; `make check`.
 
@@ -604,7 +606,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Files: `src/leva/ingest/_enrich.py`, `tests/unit/test_ingest_enrich.py`.
 - Refs: D-005, D-008, D-009, D-011, D-017, D-021, D-030.
 - Steps:
-  - Subcommands: run the extractors chain per entry, plus probes declared by curated `help_probe` (allowlist built from curated content + scanned executables), then merge.
+  - Subcommands: run the extractors chain per entry, plus probes declared by curated `help_probe` (allowlist `{name: (str(first_executable.path), *help_probe.args)}` built from curated content + scanned executables; catch `IngestError` per probe and continue), then merge with `merge_subcommands([curated, probe, section, hyphen])` (D-044); `known` is `{entry.name: KnownPage(name, summary, synopsis_body)}` over all man-backed entries (`""` when no SYNOPSIS); curated `Subcommand.source` is `"curated"`.
   - Curated attachment: explain, intents, notes, examples (each with its `danger`, D-030), related (only names that resolve), subcommands; `curated` flag; re-rank.
   - tldr attachment.
   - Curated commands that are not installed are skipped and reported.

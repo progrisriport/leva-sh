@@ -5,8 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from leva.manparse._definitions import DefinitionItem, definition_items
-from leva.manparse._name import MAX_SUMMARY, first_sentence, is_name
+from leva.manparse._name import MAX_SUMMARY, first_sentence
 from leva.manparse._sections import ParsedMan
+from leva.model import is_name
 
 
 @dataclass(frozen=True, slots=True)

@@ -230,6 +230,26 @@ def test_term_only_item_is_skipped() -> None:
     assert _names(_sections(("COMMANDS", body))) == ["alpha"]
 
 
+def test_term_starting_with_the_parent_name_is_skipped() -> None:
+    body = "     x [options]\n            Runs it.\n     alpha\n            Does alpha."
+
+    assert _names(_sections(("COMMANDS", body))) == ["alpha"]
+
+
+@pytest.mark.parametrize("term", ["manages things.", "see foo. bar", "really?", "stop!"])
+def test_prose_terms_are_skipped_and_siblings_kept(term: str) -> None:
+    body = f"     {term}\n            Prose.\n     alpha\n            Does alpha."
+
+    assert _names(_sections(("COMMANDS", body))) == ["alpha"]
+
+
+@pytest.mark.parametrize("term", ["foo [arg ...]", "bar [-x] path", "a.b [arg]", "run (now) x"])
+def test_terms_without_a_sentence_end_are_kept(term: str) -> None:
+    body = f"     {term}\n            Does it."
+
+    assert _names(_sections(("COMMANDS", body))) == [term.split()[0]]
+
+
 def test_first_occurrence_of_a_name_wins() -> None:
     first = "     alpha\n            First one."
     second = "     alpha\n            Second one."

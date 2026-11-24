@@ -9,8 +9,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
-from leva.model import Origin
-from leva.sources._names import is_entry_name
+from leva.model import Origin, is_name
 from leva.sources._origin import origin_for
 
 DEFAULT_BIN_DIRS: Final[tuple[Path, ...]] = (
@@ -52,7 +51,7 @@ def _list_dir(directory: Path) -> list[Path]:
 def _is_executable(path: Path) -> bool:
     """Tell whether `path` is, after following symlinks, a file the user may execute."""
     try:
-        return is_entry_name(path.name) and path.is_file() and os.access(path, os.X_OK)
+        return is_name(path.name) and path.is_file() and os.access(path, os.X_OK)
     except OSError as exc:
         _log.debug("skipping %s: %s", path, exc)
         return False

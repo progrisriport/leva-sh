@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import select
+import tempfile
 from collections.abc import Mapping
 from pathlib import Path
 
@@ -109,6 +110,16 @@ def test_cwd_and_home_are_one_throwaway_dir(tmp_path: Path) -> None:
     assert home.name == "home"
     assert home.parent.name.startswith("leva-probe-")
     assert not home.parent.exists()
+
+
+def test_unusable_temp_dir_raises_ingest_error(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runner = probe(tmp_path, 'echo "usage: tool"')
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path / "missing"))
+    with pytest.raises(IngestError, match=r"^probe failed: tool$") as caught:
+        runner.run("tool")
+    assert isinstance(caught.value.__cause__, OSError)
 
 
 def test_temp_dir_removed_after_empty_output(tmp_path: Path) -> None:

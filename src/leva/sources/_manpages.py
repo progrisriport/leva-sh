@@ -10,8 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Final
 
-from leva.model import IngestError, Origin
-from leva.sources._names import is_entry_name
+from leva.model import IngestError, Origin, is_name
 from leva.sources._origin import origin_for
 
 _FALLBACK_MAN_DIRS: Final = (Path("/opt/homebrew/share/man"), Path("/usr/local/share/man"))
@@ -107,7 +106,7 @@ def _parse_name(filename: str, section: str) -> str | None:
     `openssl-x509.1ssl` gives `openssl-x509`). Anything else gives None.
     """
     base, dot, ext = filename.removesuffix(".gz").rpartition(".")
-    if dot and is_entry_name(base) and ext.startswith(section):
+    if dot and is_name(base) and ext.startswith(section):
         return base
     return None
 

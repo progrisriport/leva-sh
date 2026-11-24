@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from leva.manparse._name import MAX_SUMMARY, is_name, parse_name
-from leva.model import Section
+from leva.manparse._name import MAX_SUMMARY, parse_name
+from leva.model import Section, is_name
 
 _DEFAULT_HEADING = "DESCRIPTION"
 
@@ -33,10 +33,9 @@ class ParsedMan:
     def __post_init__(self) -> None:
         if not self.names or not all(is_name(name) for name in self.names):
             raise ValueError(f"ParsedMan.names must be non-empty valid names: {self.names!r}")
-        if len(self.summary) > MAX_SUMMARY or len(self.summary.splitlines()) > 1:
+        has_break = "".join(self.summary.splitlines()) != self.summary
+        if len(self.summary) > MAX_SUMMARY or has_break:
             raise ValueError(f"ParsedMan.summary must be one line of <= {MAX_SUMMARY} chars")
-        if "\n" in self.summary or "\r" in self.summary:
-            raise ValueError("ParsedMan.summary must not contain a line break")
         if [section.ord for section in self.sections] != list(range(len(self.sections))):
             raise ValueError("ParsedMan.sections ord must run 0..n-1 in order")
 

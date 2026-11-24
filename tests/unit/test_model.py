@@ -30,6 +30,7 @@ from leva.model import (
     Subcommand,
     Verification,
     VerificationError,
+    is_name,
 )
 
 ERROR_TYPES: list[type[LevaError]] = [
@@ -285,6 +286,36 @@ def test_name_fields_reject_empty_or_whitespace_names(
         factory(**{field: name})
 
 
+@pytest.mark.parametrize("name", VALID_NAMES)
+def test_is_name_accepts_valid_names(name: str) -> None:
+    assert is_name(name)
+
+
+@pytest.mark.parametrize("name", INVALID_NAMES)
+def test_is_name_rejects_empty_or_whitespace_names(name: str) -> None:
+    assert not is_name(name)
+
+
+WHITESPACE = [" ", "\t", "\n", "\x0b", "\x0c", "\r", "\x85", NBSP, "\u2003", "\u3000"]
+VISIBLE_TEXT = st.text(
+    alphabet=st.characters(blacklist_categories=("Zs", "Zl", "Zp", "Cc")), min_size=1
+)
+
+
+@given(st.text(), st.sampled_from(WHITESPACE), st.data())
+def test_is_name_rejects_text_with_an_inserted_whitespace_character(
+    value: str, whitespace: str, data: st.DataObject
+) -> None:
+    index = data.draw(st.integers(min_value=0, max_value=len(value)))
+
+    assert not is_name(value[:index] + whitespace + value[index:])
+
+
+@given(VISIBLE_TEXT)
+def test_is_name_accepts_any_non_empty_text_without_whitespace(value: str) -> None:
+    assert is_name(value)
+
+
 def test_entry_section_none_is_accepted() -> None:
     assert make_entry(section=None).section is None
 
@@ -449,6 +480,7 @@ EXPECTED_ALL = [
     "Subcommand",
     "Verification",
     "VerificationError",
+    "is_name",
 ]
 
 

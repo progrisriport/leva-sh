@@ -94,11 +94,24 @@ class ProbeRunner:
 
         Raises:
             IngestError: `command` is not allowed (nothing is spawned), the probe cannot
-                be spawned, times out or prints nothing but whitespace.
+                be spawned or its temporary files cannot be used, times out or prints
+                nothing but whitespace.
         """
         argv = self._allowlist.get(command)
         if argv is None:
             raise IngestError(f"probe not allowed: {command}")
+        try:
+            out, err = self._capture(command, argv)
+        except OSError as exc:
+            _log.debug("probe %s cannot use its temporary directory: %s", command, exc)
+            raise IngestError(f"probe failed: {command}") from exc
+        text = out if out.strip() else err
+        if not text.strip():
+            raise IngestError(f"probe output empty: {command}")
+        return text
+
+    def _capture(self, command: str, argv: tuple[str, ...]) -> tuple[str, str]:
+        """Run `argv` in a throw-away directory and return the capped stdout and stderr."""
         with tempfile.TemporaryDirectory(prefix="leva-probe-", ignore_cleanup_errors=True) as tmp:
             root = Path(tmp)
             home = root / "home"
@@ -106,10 +119,7 @@ class ProbeRunner:
             self._execute(command, argv, home, root / "stdout", root / "stderr")
             out = _read_capped(root / "stdout", self._max_bytes)
             err = _read_capped(root / "stderr", self._max_bytes)
-        text = out if out.strip() else err
-        if not text.strip():
-            raise IngestError(f"probe output empty: {command}")
-        return text
+        return out, err
 
     def _execute(
         self, command: str, argv: tuple[str, ...], home: Path, stdout: Path, stderr: Path

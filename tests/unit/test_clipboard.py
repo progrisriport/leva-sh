@@ -18,7 +18,7 @@ def capture_to_file(tmp_path: Path, tool: str) -> tuple[PbcopyClipboard, Path]:
     """Build a clipboard over a fake pbcopy that runs ``tool`` with its stdout in a file."""
     out = tmp_path / "captured"
     binary = fake_bin(tmp_path / "bin", "pbcopy", f'{tool} > "{out}"')
-    return PbcopyClipboard(binary=str(binary)), out
+    return PbcopyClipboard(binary=str(binary), timeout=10.0), out
 
 
 def failing(tmp_path: Path, script: str, *, timeout: float = 2.0) -> PbcopyClipboard:
