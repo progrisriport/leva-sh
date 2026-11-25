@@ -6,6 +6,7 @@ import sqlite3
 from collections.abc import Iterator, Sequence
 from contextlib import contextmanager, suppress
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 from types import TracebackType
 from typing import Final
@@ -20,6 +21,7 @@ from leva.model import (
     Subcommand,
     is_name,
 )
+from leva.store._finalize import finalize_index
 from leva.store._schema import SCHEMA_VERSION, load_migrations
 
 _INSERT_ENTRY: Final = (
@@ -43,6 +45,7 @@ _INSERT_RELATED: Final = "INSERT INTO related (entry_id, ord, name) VALUES (?, ?
 _INSERT_INTENT: Final = "INSERT INTO intent (entry_id, ord, text) VALUES (?, ?, ?)"
 _REPLACE_META: Final = "INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)"
 
+_FINALIZED: Final = "index writer is already finalized"
 _UNIQUE: Final = "SQLITE_CONSTRAINT_UNIQUE"
 _FOREIGN_KEY: Final = "SQLITE_CONSTRAINT_FOREIGNKEY"
 
@@ -132,6 +135,7 @@ class IndexWriter:
         self._path = path
         self._conn: sqlite3.Connection | None = None
         self._entered = False
+        self._finalized = False
 
     def __enter__(self) -> IndexWriter:
         """Create the file, apply the schema and start the transaction.
@@ -297,6 +301,32 @@ class IndexWriter:
         with self._writing() as conn:
             conn.execute(_REPLACE_META, (key, value))
 
+    def finalize(self, *, built_at: datetime) -> str:
+        """Fill `search_fts`, optimize, write meta, ``ANALYZE`` and check integrity.
+
+        After this call every ``add_*`` and ``set_meta`` raises ``ValueError``; leaving the
+        ``with`` block still commits.
+
+        Args:
+            built_at: Timezone-aware build time, stored in UTC as ``meta.built_at``.
+
+        Returns:
+            The ``index_digest`` (64 lowercase hex characters).
+
+        Raises:
+            ValueError: If the writer is not open or already finalized, or `built_at` is naive.
+            IngestError: If a write fails or the integrity check does not return ``ok``.
+        """
+        conn = self._connection()
+        if self._finalized:
+            raise ValueError(_FINALIZED)
+        if built_at.utcoffset() is None:
+            raise ValueError("built_at must be timezone-aware")
+        with self._mapping():
+            digest = finalize_index(conn, self._path, built_at)
+        self._finalized = True
+        return digest
+
     def _insert_many(self, sql: str, rows: Sequence[tuple[object, ...]], entry_id: int) -> None:
         with self._writing(entry_id=entry_id) as conn:
             conn.executemany(sql, rows)
@@ -313,14 +343,24 @@ class IndexWriter:
     def _writing(
         self, *, entry_id: int | None = None, duplicate: str | None = None
     ) -> Iterator[sqlite3.Connection]:
-        """Yield the open connection and map SQLite errors to `IngestError`.
+        """Yield the open connection of a not yet finalized writer, mapping SQLite errors."""
+        conn = self._connection()
+        if self._finalized:
+            raise ValueError(_FINALIZED)
+        with self._mapping(entry_id=entry_id, duplicate=duplicate):
+            yield conn
+
+    @contextmanager
+    def _mapping(
+        self, *, entry_id: int | None = None, duplicate: str | None = None
+    ) -> Iterator[None]:
+        """Map SQLite errors to `IngestError`.
 
         A text that cannot be encoded to UTF-8 (a lone surrogate) is mapped the same way, so
         only `IngestError` leaves a write.
         """
-        conn = self._connection()
         try:
-            yield conn
+            yield
         except sqlite3.IntegrityError as exc:
             code = exc.sqlite_errorname
             if code == _FOREIGN_KEY and entry_id is not None:

@@ -482,8 +482,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - `open_readonly(path)`: `mode=ro` URI; missing, corrupt or wrong `user_version` raises IndexUnavailableError.
 - Accept: `uv run pytest tests/unit/test_store_writer.py -q` (rollback, UNIQUE incl. NULL section, ro open errors); `make check`.
 
-- [ ] T-4.2 `leva.store` (B): finalize, FTS and digest
-- Files: `src/leva/store/_finalize.py`, `tests/integration/test_store_finalize.py`.
+- [x] T-4.2 `leva.store` (B): finalize, FTS and digest
+- Files: `src/leva/store/_finalize.py`, `src/leva/store/_writer.py`, `tests/integration/test_store_finalize.py`.
 - Refs: DITS §9; ADR-0003; S-3.
 - Steps:
   - `finalize()`:
