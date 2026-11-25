@@ -1,0 +1,2016 @@
+{
+ "meta": {
+  "attribution": "Synthetic fixture data written for tests. Example shapes imitate tldr-pages entries, which are licensed CC BY 4.0; no tldr text is included.",
+  "leva_version": "0.0.0-fixture"
+ },
+ "entries": [
+  {
+   "name": "awk",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "scan lines and run small programs on their fields",
+   "path": "/usr/bin/awk",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "awk - scan lines and run small programs on their fields"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "awk [-F sep] program [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Reads input line by line, splits each line into fields and runs the program on the lines it matches."
+    }
+   ]
+  },
+  {
+   "name": "bat",
+   "section": null,
+   "kind": "executable",
+   "origin": "homebrew",
+   "summary": "",
+   "path": "/opt/homebrew/bin/bat",
+   "has_man": false,
+   "curated": false,
+   "rank": 0
+  },
+  {
+   "name": "brew",
+   "section": "1",
+   "kind": "executable",
+   "origin": "homebrew",
+   "summary": "install and update packages from a community repository",
+   "path": "/opt/homebrew/bin/brew",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "brew - install and update packages"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "brew command [arguments]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Installs, upgrades and removes packages kept in formula files."
+    }
+   ]
+  },
+  {
+   "name": "cat",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "print files one after another",
+   "path": "/bin/cat",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "cat - print files one after another"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "cat [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Copies each file to standard output in the order given, or standard input when none is named."
+    }
+   ]
+  },
+  {
+   "name": "cd",
+   "section": null,
+   "kind": "builtin",
+   "origin": "bash",
+   "summary": "change the current folder",
+   "path": null,
+   "has_man": true,
+   "curated": false,
+   "rank": 1,
+   "sections": [
+    {
+     "heading": "SYNOPSIS",
+     "body": "cd [folder]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Makes the given folder the working folder of the shell."
+    }
+   ]
+  },
+  {
+   "name": "cd",
+   "section": null,
+   "kind": "builtin",
+   "origin": "zsh",
+   "summary": "change the current folder",
+   "path": null,
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "SYNOPSIS",
+     "body": "cd [folder]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Makes the given folder the working folder of the shell."
+    }
+   ]
+  },
+  {
+   "name": "chmod",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "change the permission bits of files",
+   "path": "/bin/chmod",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Changes the access permissions of files and folders. A mode is either a three digit octal number or a symbolic change such as adding execute for the owner.",
+   "intents": [
+    "change file permissions",
+    "make a script executable",
+    "remove write access"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "chmod - change the permission bits of files"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "chmod [-R] mode file ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Sets who may read, write or run each file, using octal or symbolic modes."
+    }
+   ],
+   "examples": [
+    {
+     "id": "chmod-executable",
+     "desc": "Make a script runnable",
+     "cmd": "chmod +x {{script}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "chmod-octal",
+     "desc": "Set an exact mode",
+     "cmd": "chmod 644 {{file}}",
+     "source": "curated",
+     "verified": "exec"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "safety",
+     "text": "A recursive change with a wide mode on the wrong folder is hard to undo; check the path first."
+    }
+   ],
+   "related": [
+    "chown",
+    "ls"
+   ]
+  },
+  {
+   "name": "chown",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "change the owner and group of files",
+   "path": "/usr/sbin/chown",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "chown - change the owner and group of files"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "chown owner[:group] file ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Sets a new owning user and optionally a new group on every file named."
+    }
+   ]
+  },
+  {
+   "name": "cp",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "copy files and folders",
+   "path": "/bin/cp",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "cp - copy files and folders"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "cp [-R] source ... target"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Duplicates the sources into the target; a folder source needs the recursive switch."
+    }
+   ]
+  },
+  {
+   "name": "curl",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "transfer data from or to a server by address",
+   "path": "/usr/bin/curl",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Talks to servers over web protocols. It prints the response body by default, which makes it handy in pipes. Switches save to a file, follow redirects or send data.",
+   "intents": [
+    "download a file",
+    "call a web api",
+    "check a server response"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "curl - transfer data from or to a server by address"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "curl [-fsSLo] address"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Requests an address and prints the response, or saves it with an output switch."
+    }
+   ],
+   "examples": [
+    {
+     "id": "curl-download",
+     "desc": "Save a file under a chosen name and follow redirects",
+     "cmd": "curl -L -o {{file}} {{address}}",
+     "source": "curated",
+     "verified": "static"
+    },
+    {
+     "id": "curl-headers",
+     "desc": "Show only the response headers",
+     "cmd": "curl -I {{address}}",
+     "source": "curated",
+     "verified": "static"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "zsh-bash",
+     "text": "Quote addresses that contain a question mark or an ampersand, or the shell will interpret them."
+    }
+   ],
+   "related": [
+    "ssh",
+    "scp"
+   ]
+  },
+  {
+   "name": "cut",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "keep selected columns of each line",
+   "path": "/usr/bin/cut",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "cut - keep selected columns of each line"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "cut -f list [-d sep] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Prints only the chosen fields or character positions of every input line."
+    }
+   ]
+  },
+  {
+   "name": "date",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "show or set the system date and time",
+   "path": "/bin/date",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "date - show or set the system date and time"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "date [+format]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Prints the current time, optionally laid out by a format string made of percent codes."
+    }
+   ]
+  },
+  {
+   "name": "df",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "report free and used space on mounted volumes",
+   "path": "/bin/df",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "df - report free and used space on mounted volumes"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "df [-h] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Lists each mounted volume with its size, used space and free space."
+    }
+   ]
+  },
+  {
+   "name": "diff",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "compare two files line by line",
+   "path": "/usr/bin/diff",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "diff - compare two files line by line"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "diff [-u] file1 file2"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Prints the lines that differ between two files, optionally in the unified patch layout."
+    }
+   ]
+  },
+  {
+   "name": "diskutil",
+   "section": "8",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "inspect and change disks and volumes",
+   "path": "/usr/sbin/diskutil",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "The command line tool for disks on macOS. Verbs list disks, show details, mount and unmount volumes, and format them. Formatting verbs destroy everything on the target.",
+   "intents": [
+    "list disks and volumes",
+    "erase a disk",
+    "mount a volume"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "diskutil - inspect and change disks and volumes"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "diskutil verb [arguments]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Each verb works on disks, partitions or volumes; some verbs erase data."
+    }
+   ],
+   "examples": [
+    {
+     "id": "diskutil-list",
+     "desc": "List all disks and their partitions",
+     "cmd": "diskutil list",
+     "source": "curated",
+     "verified": "static"
+    },
+    {
+     "id": "diskutil-erase",
+     "desc": "Erase a whole disk and format it as APFS",
+     "cmd": "diskutil eraseDisk APFS {{name}} {{disk}}",
+     "source": "curated",
+     "verified": "skip",
+     "danger": "erases the whole disk, every volume on it is lost"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "safety",
+     "text": "Check the disk identifier with the list verb before any verb that erases."
+    }
+   ],
+   "subcommands": [
+    {
+     "name": "list",
+     "summary": "show disks and partitions",
+     "entry_name": null,
+     "source": "section",
+     "body": "Prints every attached disk with its partitions and sizes."
+    },
+    {
+     "name": "info",
+     "summary": "show details of one disk",
+     "entry_name": null,
+     "source": "section",
+     "body": "Prints type, size, mount point and file system of a disk or volume."
+    },
+    {
+     "name": "mount",
+     "summary": "attach a volume",
+     "entry_name": null,
+     "source": "section",
+     "body": "Makes a volume reachable below the volumes folder."
+    },
+    {
+     "name": "unmount",
+     "summary": "detach a volume",
+     "entry_name": null,
+     "source": "section",
+     "body": "Releases a volume so the disk can be removed safely."
+    },
+    {
+     "name": "eraseDisk",
+     "summary": "erase and reformat a whole disk",
+     "entry_name": null,
+     "source": "curated",
+     "body": "Wipes the disk and creates one new volume with the given format and name."
+    }
+   ],
+   "related": [
+    "df",
+    "du"
+   ]
+  },
+  {
+   "name": "ditto",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "copy folder trees while keeping macOS metadata",
+   "path": "/usr/bin/ditto",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "ditto - copy folder trees while keeping macOS metadata"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "ditto [-V] source ... target"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Copies files and folders and can keep resource forks, extended attributes and permissions."
+    }
+   ]
+  },
+  {
+   "name": "du",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "show how much disk space files and folders use",
+   "path": "/usr/bin/du",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Reports the disk space taken by files and folders. By default it prints one line for every subfolder. Combine the summary and human switches for a compact answer.",
+   "intents": [
+    "disk usage of a folder",
+    "find what takes up space",
+    "show sizes in megabytes"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "du - show how much disk space files and folders use"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "du [-hs] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Adds up the space used under each path and prints one line per folder."
+    }
+   ],
+   "examples": [
+    {
+     "id": "du-summary",
+     "desc": "Print one total for a folder in readable units",
+     "cmd": "du -sh {{folder}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "du-depth",
+     "desc": "Show sizes one level down",
+     "cmd": "du -h -d 1 {{folder}}",
+     "source": "curated",
+     "verified": "exec"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "macos",
+     "text": "Sizes count disk blocks, so compressed or sparse files can look smaller than their length."
+    }
+   ],
+   "related": [
+    "df",
+    "ls"
+   ]
+  },
+  {
+   "name": "echo",
+   "section": null,
+   "kind": "builtin",
+   "origin": "bash",
+   "summary": "print its arguments",
+   "path": null,
+   "has_man": true,
+   "curated": false,
+   "rank": 2,
+   "sections": [
+    {
+     "heading": "SYNOPSIS",
+     "body": "echo [-n] [argument ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Writes the arguments to standard output separated by spaces."
+    }
+   ]
+  },
+  {
+   "name": "echo",
+   "section": null,
+   "kind": "builtin",
+   "origin": "zsh",
+   "summary": "print its arguments",
+   "path": null,
+   "has_man": true,
+   "curated": false,
+   "rank": 1,
+   "sections": [
+    {
+     "heading": "SYNOPSIS",
+     "body": "echo [-n] [argument ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Writes the arguments to standard output separated by spaces."
+    }
+   ]
+  },
+  {
+   "name": "echo",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "print its arguments",
+   "path": "/bin/echo",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "echo - print its arguments"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "echo [-n] [string ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Writes the arguments separated by spaces, then a newline unless told not to."
+    }
+   ],
+   "notes": [
+    {
+     "kind": "zsh-bash",
+     "text": "The builtin versions of echo may treat backslashes differently from this program."
+    }
+   ]
+  },
+  {
+   "name": "find",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "search for files in a folder tree",
+   "path": "/usr/bin/find",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Walks a folder tree and prints the files that satisfy an expression of tests. Tests can look at the name, type, size and age of a file. Actions such as exec run a command on every match.",
+   "intents": [
+    "find files by name",
+    "find large files",
+    "run a command on many files"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "find - search for files in a folder tree"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "find [folder ...] [expression]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": [
+      "Walks each folder named on the command line from the top down and evaluates an expression",
+      "for every file it meets. The expression is a chain of tests, actions and operators.",
+      "",
+      "Tests look at one property of a file and answer yes or no. Actions do something with a file.",
+      "When the expression has no action, the path of every matching file is printed.",
+      "",
+      "-name",
+      "        True when the base name of the file satisfies the given value (shell pattern).",
+      "        A leading plus sign means greater than and a minus sign means less than for name.",
+      "        Combine -name with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -name early in the expression when it rules out many files cheaply.",
+      "",
+      "-iname",
+      "        True when the base name, ignoring case of the file satisfies the given value (shell pattern).",
+      "        A leading plus sign means greater than and a minus sign means less than for iname.",
+      "        Combine -iname with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -iname early in the expression when it rules out many files cheaply.",
+      "",
+      "-path",
+      "        True when the whole path of the file satisfies the given value (shell pattern).",
+      "        A leading plus sign means greater than and a minus sign means less than for path.",
+      "        Combine -path with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -path early in the expression when it rules out many files cheaply.",
+      "",
+      "-type",
+      "        True when the kind of file of the file satisfies the given value (single letter).",
+      "        A leading plus sign means greater than and a minus sign means less than for type.",
+      "        Combine -type with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -type early in the expression when it rules out many files cheaply.",
+      "",
+      "-size",
+      "        True when the size of the file satisfies the given value (number with a unit).",
+      "        A leading plus sign means greater than and a minus sign means less than for size.",
+      "        Combine -size with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -size early in the expression when it rules out many files cheaply.",
+      "",
+      "-mtime",
+      "        True when the modification age of the file satisfies the given value (number of days).",
+      "        A leading plus sign means greater than and a minus sign means less than for mtime.",
+      "        Combine -mtime with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -mtime early in the expression when it rules out many files cheaply.",
+      "",
+      "-atime",
+      "        True when the access age of the file satisfies the given value (number of days).",
+      "        A leading plus sign means greater than and a minus sign means less than for atime.",
+      "        Combine -atime with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -atime early in the expression when it rules out many files cheaply.",
+      "",
+      "-ctime",
+      "        True when the status change age of the file satisfies the given value (number of days).",
+      "        A leading plus sign means greater than and a minus sign means less than for ctime.",
+      "        Combine -ctime with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -ctime early in the expression when it rules out many files cheaply.",
+      "",
+      "-perm",
+      "        True when the permission bits of the file satisfies the given value (octal mode).",
+      "        A leading plus sign means greater than and a minus sign means less than for perm.",
+      "        Combine -perm with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -perm early in the expression when it rules out many files cheaply.",
+      "",
+      "-user",
+      "        True when the owner of the file satisfies the given value (user name or id).",
+      "        A leading plus sign means greater than and a minus sign means less than for user.",
+      "        Combine -user with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -user early in the expression when it rules out many files cheaply.",
+      "",
+      "-group",
+      "        True when the group of the file satisfies the given value (group name or id).",
+      "        A leading plus sign means greater than and a minus sign means less than for group.",
+      "        Combine -group with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -group early in the expression when it rules out many files cheaply.",
+      "",
+      "-links",
+      "        True when the link count of the file satisfies the given value (number).",
+      "        A leading plus sign means greater than and a minus sign means less than for links.",
+      "        Combine -links with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -links early in the expression when it rules out many files cheaply.",
+      "",
+      "-empty",
+      "        True when the emptiness of the file satisfies the given value (no value).",
+      "        A leading plus sign means greater than and a minus sign means less than for empty.",
+      "        Combine -empty with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -empty early in the expression when it rules out many files cheaply.",
+      "",
+      "-newer",
+      "        True when the modification time against a reference of the file satisfies the given value (path of the reference file).",
+      "        A leading plus sign means greater than and a minus sign means less than for newer.",
+      "        Combine -newer with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -newer early in the expression when it rules out many files cheaply.",
+      "",
+      "-depth",
+      "        True when the level below the start of the file satisfies the given value (number).",
+      "        A leading plus sign means greater than and a minus sign means less than for depth.",
+      "        Combine -depth with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -depth early in the expression when it rules out many files cheaply.",
+      "",
+      "-flags",
+      "        True when the file flags of the file satisfies the given value (flag list).",
+      "        A leading plus sign means greater than and a minus sign means less than for flags.",
+      "        Combine -flags with the operators -and, -or and -not to build larger expressions.",
+      "        Tests are evaluated from left to right and stop at the first one that fails.",
+      "        Use -flags early in the expression when it rules out many files cheaply.",
+      "",
+      "-exec command {} ;",
+      "        Run the command once per match, with the braces replaced by the path; a trailing plus runs it once for many matches, which is much faster on large trees.",
+      "-print0",
+      "        Print each path followed by a zero byte so that names with spaces survive a pipe.",
+      "-delete",
+      "        Remove each matching file or empty folder; test the expression with print first."
+     ]
+    },
+    {
+     "heading": "OPTIONS",
+     "body": "-H, -L, -P  choose how symbolic links are followed"
+    }
+   ],
+   "examples": [
+    {
+     "id": "find-by-name",
+     "desc": "Find files whose name matches a pattern",
+     "cmd": "find {{folder}} -name '{{pattern}}'",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "find-large",
+     "desc": "Find files bigger than a size",
+     "cmd": "find {{folder}} -type f -size +{{100M}}",
+     "source": "curated",
+     "verified": "exec"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "bsd-gnu",
+     "text": "The folder argument is required on macOS; the GNU version assumes the current folder."
+    }
+   ],
+   "related": [
+    "ls",
+    "grep",
+    "xargs"
+   ]
+  },
+  {
+   "name": "git",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "track changes to files in a repository",
+   "path": "/usr/bin/git",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "A distributed version control system. It records snapshots of a project and lets many people work on branches that are merged later. Most work goes through subcommands.",
+   "intents": [
+    "save my changes",
+    "see what changed",
+    "undo the last commit"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "git - track changes to files in a repository"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "git [--version] command [arguments]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Front end to a set of subcommands for recording and sharing the history of a project."
+    }
+   ],
+   "examples": [
+    {
+     "id": "git-status",
+     "desc": "Show changed and untracked files",
+     "cmd": "git status",
+     "source": "curated",
+     "verified": "static"
+    },
+    {
+     "id": "git-log-short",
+     "desc": "Show history in one line per commit",
+     "cmd": "git log --oneline",
+     "source": "curated",
+     "verified": "static"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "macos",
+     "text": "The system copy comes with the developer tools and may be older than a Homebrew one."
+    }
+   ],
+   "subcommands": [
+    {
+     "name": "commit",
+     "summary": "record staged changes",
+     "entry_name": "git-commit",
+     "source": "hyphen"
+    },
+    {
+     "name": "log",
+     "summary": "show commit history",
+     "entry_name": "git-log",
+     "source": "hyphen"
+    },
+    {
+     "name": "status",
+     "summary": "show the working tree state",
+     "entry_name": null,
+     "source": "probe"
+    }
+   ],
+   "related": [
+    "diff",
+    "grep"
+   ]
+  },
+  {
+   "name": "git-commit",
+   "section": "1",
+   "kind": "manpage",
+   "origin": "macos",
+   "summary": "record staged changes in the history",
+   "path": null,
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "git-commit - record staged changes in the history"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "git commit [-m message]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Stores a snapshot of the staged changes together with a message."
+    }
+   ]
+  },
+  {
+   "name": "git-log",
+   "section": "1",
+   "kind": "manpage",
+   "origin": "macos",
+   "summary": "show the commit history",
+   "path": null,
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "git-log - show the commit history"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "git log [--oneline] [range]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Lists commits starting from the newest, optionally in a compact form."
+    }
+   ]
+  },
+  {
+   "name": "grep",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "search files for lines that match a pattern",
+   "path": "/usr/bin/grep",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Filters text by pattern. It reads files or standard input and prints the lines that match. Use the recursive switch to search a whole folder tree.",
+   "aliases": [
+    "egrep",
+    "fgrep"
+   ],
+   "intents": [
+    "search text in files",
+    "filter lines of output",
+    "count matching lines"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "grep - search files for lines that match a pattern"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "grep [-inrv] pattern [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Prints every input line that matches the pattern; switches invert, count or recurse."
+    }
+   ],
+   "examples": [
+    {
+     "id": "grep-recursive",
+     "desc": "Search a folder tree for a word, ignoring case",
+     "cmd": "grep -rin {{word}} {{folder}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "grep-invert",
+     "desc": "Show lines that do not contain a word",
+     "cmd": "grep -v {{word}} {{file}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "grep-count",
+     "desc": "Count the matching lines",
+     "cmd": "grep -c {{word}} {{file}}",
+     "source": "curated",
+     "verified": "exec"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "bsd-gnu",
+     "text": "Perl-style patterns are not available in the macOS version; use the extended switch instead."
+    }
+   ],
+   "related": [
+    "sed",
+    "find",
+    "awk"
+   ]
+  },
+  {
+   "name": "gzip",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "compress files with the deflate method",
+   "path": "/usr/bin/gzip",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "aliases": [
+    "gunzip",
+    "zcat"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "gzip - compress files with the deflate method"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "gzip [-dk] file ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Replaces each file with a compressed copy ending in a suffix; the decompress switch reverses it."
+    }
+   ]
+  },
+  {
+   "name": "head",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "print the first lines of a file",
+   "path": "/usr/bin/head",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "head - print the first lines of a file"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "head [-n count] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Shows the beginning of each file, ten lines unless a count is given."
+    }
+   ]
+  },
+  {
+   "name": "kill",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "send a signal to a process",
+   "path": "/bin/kill",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "kill - send a signal to a process"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "kill [-signal] pid ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Delivers a signal, by default a polite termination request, to each listed process id."
+    }
+   ],
+   "related": [
+    "pkill",
+    "ps"
+   ]
+  },
+  {
+   "name": "less",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "page through text one screen at a time",
+   "path": "/usr/bin/less",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "less - page through text one screen at a time"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "less [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Displays a file in a pager that scrolls both ways and searches forward and backward."
+    }
+   ]
+  },
+  {
+   "name": "ln",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "create links between files",
+   "path": "/bin/ln",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "ln - create links between files"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "ln [-s] target [name]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Makes a new directory entry for an existing file, hard by default or symbolic on request."
+    }
+   ]
+  },
+  {
+   "name": "ls",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "list the contents of folders",
+   "path": "/bin/ls",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Lists what a folder contains. By default it shows names only, sorted alphabetically. Add a switch for a long table with sizes and dates, or to include hidden files.",
+   "intents": [
+    "list files in a folder",
+    "show hidden files",
+    "see file sizes and dates"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "ls - list the contents of folders"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "ls [-alh] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Prints the names of files and folders; switches add sizes, dates and hidden items."
+    }
+   ],
+   "examples": [
+    {
+     "id": "ls-long",
+     "desc": "Show a long table with permissions, owner, size and date",
+     "cmd": "ls -l",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "ls-all",
+     "desc": "Include hidden files",
+     "cmd": "ls -a {{folder}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "ls-human-sizes",
+     "desc": "Print sizes in units like K and M",
+     "cmd": "ls -lh",
+     "source": "curated",
+     "verified": "exec"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "bsd-gnu",
+     "text": "The macOS version has no long option names; the color switch is a capital G."
+    }
+   ],
+   "related": [
+    "find",
+    "du",
+    "cd"
+   ]
+  },
+  {
+   "name": "man",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "read the manual page of a command",
+   "path": "/usr/bin/man",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "man - read the manual page of a command"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "man [section] name"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Finds the manual page for a name and shows it through a pager."
+    }
+   ]
+  },
+  {
+   "name": "mkdir",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "create folders",
+   "path": "/bin/mkdir",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "mkdir - create folders"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "mkdir [-p] folder ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Creates each named folder; the parent switch also creates missing parents."
+    }
+   ]
+  },
+  {
+   "name": "mv",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "move or rename files",
+   "path": "/bin/mv",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "mv - move or rename files"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "mv source ... target"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Renames a file or moves several files into a target folder."
+    }
+   ]
+  },
+  {
+   "name": "open",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "open files, folders and addresses with their default app",
+   "path": "/usr/bin/open",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "open - open files, folders and addresses with their default app"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "open [-a app] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Hands each argument to the application the system associates with it, or to a named one."
+    }
+   ],
+   "examples": [
+    {
+     "id": "open-tldr-1",
+     "desc": "Open a folder in Finder",
+     "cmd": "open {{folder}}",
+     "source": "tldr",
+     "verified": "none"
+    }
+   ]
+  },
+  {
+   "name": "pbcopy",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "put standard input on the clipboard",
+   "path": "/usr/bin/pbcopy",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "pbcopy - put standard input on the clipboard"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "pbcopy"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Reads text from standard input and stores it on the general pasteboard."
+    }
+   ]
+  },
+  {
+   "name": "pkill",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "send a signal to processes found by name",
+   "path": "/usr/bin/pkill",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "pkill - send a signal to processes found by name"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "pkill [-signal] pattern"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Looks up running processes whose name matches the pattern and signals every match."
+    }
+   ],
+   "related": [
+    "kill",
+    "ps"
+   ]
+  },
+  {
+   "name": "ps",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "list running processes",
+   "path": "/bin/ps",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "ps - list running processes"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "ps [-ef]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Prints a snapshot of the processes on the machine with their ids and owners."
+    }
+   ],
+   "examples": [
+    {
+     "id": "ps-tldr-1",
+     "desc": "Show every process on the system in the long format",
+     "cmd": "ps -ef",
+     "source": "tldr",
+     "verified": "none"
+    },
+    {
+     "id": "ps-tldr-2",
+     "desc": "Show the processes of the current user",
+     "cmd": "ps -u {{user}}",
+     "source": "tldr",
+     "verified": "none"
+    },
+    {
+     "id": "ps-tldr-3",
+     "desc": "Find a process by part of its name",
+     "cmd": "ps -ef | grep {{name}}",
+     "source": "tldr",
+     "verified": "none"
+    }
+   ]
+  },
+  {
+   "name": "rm",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "delete files and folders",
+   "path": "/bin/rm",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Removes files and folders permanently. Nothing goes to the Trash. The recursive switch deletes whole trees.",
+   "intents": [
+    "delete a file",
+    "delete a folder",
+    "remove files safely"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "rm - delete files and folders"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "rm [-fiR] file ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Unlinks each file; the recursive switch removes folders and their contents."
+    }
+   ],
+   "examples": [
+    {
+     "id": "rm-file",
+     "desc": "Delete one file",
+     "cmd": "rm {{file}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "rm-folder",
+     "desc": "Delete a folder and everything in it",
+     "cmd": "rm -rf {{folder}}",
+     "source": "curated",
+     "verified": "skip",
+     "danger": "deletes the folder and everything in it, no Trash, no undo"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "safety",
+     "text": "There is no undo; use the interactive switch when unsure."
+    }
+   ],
+   "related": [
+    "mv",
+    "ls"
+   ]
+  },
+  {
+   "name": "scp",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "copy files between machines over a secure connection",
+   "path": "/usr/bin/scp",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "scp - copy files between machines over a secure connection"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "scp [-r] source ... [user@]host:target"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Transfers files to or from a remote host using the secure shell transport."
+    }
+   ]
+  },
+  {
+   "name": "sed",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "edit a stream of text with short scripts",
+   "path": "/usr/bin/sed",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "sed - edit a stream of text with short scripts"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "sed [-E] script [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Applies editing commands such as substitution to every input line and prints the result."
+    }
+   ]
+  },
+  {
+   "name": "sort",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "put lines in order",
+   "path": "/usr/bin/sort",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "sort - put lines in order"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "sort [-nr] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Orders the input lines alphabetically, or numerically with a switch, and prints them."
+    }
+   ]
+  },
+  {
+   "name": "ssh",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "log in to a remote machine securely",
+   "path": "/usr/bin/ssh",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "ssh - log in to a remote machine securely"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "ssh [user@]host [command]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Opens an encrypted session to another machine, or runs one command there."
+    }
+   ]
+  },
+  {
+   "name": "sync",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "flush file system buffers to disk",
+   "path": "/bin/sync",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "sync - flush file system buffers to disk"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "sync"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Forces cached writes out to the disks."
+    }
+   ]
+  },
+  {
+   "name": "sync",
+   "section": "8",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "flush file system buffers to disk (administrator view)",
+   "path": "/bin/sync",
+   "has_man": true,
+   "curated": false,
+   "rank": 1,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "sync - flush file system buffers to disk (administrator view)"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "sync"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Describes the system level behaviour of flushing cached writes."
+    }
+   ]
+  },
+  {
+   "name": "tail",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "print the last lines of a file",
+   "path": "/usr/bin/tail",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "tail - print the last lines of a file"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "tail [-f] [-n count] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Shows the end of each file; the follow switch keeps printing lines as they are appended."
+    }
+   ]
+  },
+  {
+   "name": "tar",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "pack and unpack archive files",
+   "path": "/usr/bin/tar",
+   "has_man": true,
+   "curated": true,
+   "rank": 0,
+   "explain": "Bundles many files into a single archive and brings them back out again. One mode flag picks create, extract or list, and the file flag names the archive. Add the z flag to compress with gzip on the way.",
+   "intents": [
+    "compress a folder",
+    "extract an archive",
+    "list archive contents",
+    "bundle files into one file"
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "tar - pack and unpack archive files"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "tar -c|-x|-t [-z] -f archive [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Creates an archive from files, extracts one, or lists what it holds."
+    }
+   ],
+   "examples": [
+    {
+     "id": "tar-create-gzip",
+     "desc": "Pack a folder into a compressed archive",
+     "cmd": "tar -czf {{archive.tar.gz}} {{folder}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "tar-extract",
+     "desc": "Unpack an archive into the current folder",
+     "cmd": "tar -xf {{archive.tar.gz}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "tar-list",
+     "desc": "Show the contents without extracting",
+     "cmd": "tar -tf {{archive.tar.gz}}",
+     "source": "curated",
+     "verified": "exec"
+    },
+    {
+     "id": "tar-tldr-1",
+     "desc": "Pack a directory into a gzip tarball",
+     "cmd": "tar  -czf {{target.tar.gz}} {{dir}}",
+     "source": "tldr",
+     "verified": "none"
+    },
+    {
+     "id": "tar-tldr-2",
+     "desc": "Extract a tarball into a chosen directory",
+     "cmd": "tar -xf {{target.tar.gz}} -C {{dir}}",
+     "source": "tldr",
+     "verified": "none"
+    }
+   ],
+   "notes": [
+    {
+     "kind": "macos",
+     "text": "Archives made on macOS may carry extra metadata entries that other systems show as hidden files."
+    }
+   ],
+   "related": [
+    "gzip",
+    "zip",
+    "unzip"
+   ]
+  },
+  {
+   "name": "test",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "evaluate a condition for use in scripts",
+   "path": "/bin/test",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "aliases": [
+    "["
+   ],
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "test - evaluate a condition for use in scripts"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "test expression"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Exits with success when the expression is true. The same program answers to a bracket name."
+    }
+   ]
+  },
+  {
+   "name": "touch",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "create files or update their timestamps",
+   "path": "/usr/bin/touch",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "touch - create files or update their timestamps"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "touch file ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Creates missing files empty and sets the modification time of existing ones to now."
+    }
+   ]
+  },
+  {
+   "name": "tr",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "translate or delete characters",
+   "path": "/usr/bin/tr",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "tr - translate or delete characters"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "tr [-d] set1 [set2]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Reads standard input and swaps each character of the first set for the matching one of the second."
+    }
+   ]
+  },
+  {
+   "name": "uniq",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "collapse repeated adjacent lines",
+   "path": "/usr/bin/uniq",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "uniq - collapse repeated adjacent lines"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "uniq [-c] [file]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Drops a line that equals the one before it; the count switch prefixes how often it occurred."
+    }
+   ]
+  },
+  {
+   "name": "unzip",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "extract files from a zip archive",
+   "path": "/usr/bin/unzip",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "unzip - extract files from a zip archive"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "unzip [-l] archive [-d folder]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Unpacks the members of a zip archive, or just lists them."
+    }
+   ],
+   "related": [
+    "zip",
+    "tar"
+   ]
+  },
+  {
+   "name": "wc",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "count lines, words and bytes",
+   "path": "/usr/bin/wc",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "wc - count lines, words and bytes"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "wc [-lwc] [file ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Prints how many lines, words and bytes each input holds."
+    }
+   ]
+  },
+  {
+   "name": "which",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "show where a command lives",
+   "path": "/usr/bin/which",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "which - show where a command lives"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "which name ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Searches the directories of the command path and prints the first match for each name."
+    }
+   ]
+  },
+  {
+   "name": "whoami",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "print the current user name",
+   "path": "/usr/bin/whoami",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "whoami - print the current user name"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "whoami"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Writes the login name of the user running it."
+    }
+   ]
+  },
+  {
+   "name": "xargs",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "build command lines from standard input",
+   "path": "/usr/bin/xargs",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "xargs - build command lines from standard input"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "xargs [-0] command [arg ...]"
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Reads items from standard input and runs the command with them appended as arguments."
+    }
+   ]
+  },
+  {
+   "name": "zip",
+   "section": "1",
+   "kind": "executable",
+   "origin": "macos",
+   "summary": "pack files into a zip archive",
+   "path": "/usr/bin/zip",
+   "has_man": true,
+   "curated": false,
+   "rank": 0,
+   "sections": [
+    {
+     "heading": "NAME",
+     "body": "zip - pack files into a zip archive"
+    },
+    {
+     "heading": "SYNOPSIS",
+     "body": "zip [-r] archive file ..."
+    },
+    {
+     "heading": "DESCRIPTION",
+     "body": "Adds files to a zip archive; the recursive switch walks into folders."
+    }
+   ],
+   "related": [
+    "unzip",
+    "gzip"
+   ]
+  }
+ ]
+}

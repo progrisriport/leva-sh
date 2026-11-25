@@ -494,8 +494,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Determinism test: two writes of the same input give the same digest.
 - Accept: `uv run pytest -m integration tests/integration/test_store_finalize.py -q`; `make check`.
 
-- [ ] T-4.3 Fixture index factory (test support)
-- Files: `tests/support/index_factory.py`, `tests/fixtures/index/entries.json`, `tests/unit/test_index_factory.py`.
+- [x] T-4.3 Fixture index factory (test support)
+- Files: `tests/support/index_factory.py`, `tests/fixtures/index/entries.json`, `tests/unit/test_index_factory.py`, `tests/conftest.py`.
 - Refs: TEST-STRATEGY §5.
 - Steps:
   - Build a fixture index of about 60 synthetic entries with IndexWriter:

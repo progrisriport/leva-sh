@@ -8,6 +8,8 @@ from typing import Final
 import pytest
 from hypothesis import settings
 
+from tests.support.index_factory import build_fixture_index
+
 pytest_plugins = ("pytester",)
 
 TESTS_ROOT: Final = Path(__file__).resolve().parent
@@ -46,6 +48,12 @@ def clean_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("HOME", str(home))
     for name, value in PINNED_ENV.items():
         monkeypatch.setenv(name, value)
+
+
+@pytest.fixture
+def fixture_index(tmp_path: Path) -> Path:
+    """Path of a freshly built fixture index (tests/fixtures/index/entries.json)."""
+    return build_fixture_index(tmp_path / "fixture-index" / "index.db")
 
 
 @pytest.hookimpl(tryfirst=True)
