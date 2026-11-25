@@ -29,6 +29,7 @@ from leva.repo._rows import (
     to_section,
     to_subcommand,
 )
+from leva.repo._text import is_encodable
 
 _BM25: Final = "bm25(search_fts, " + ", ".join(str(weight) for weight in FTS_WEIGHTS) + ")"
 
@@ -122,9 +123,10 @@ class Repository:
         id for names, the entry name then the id for aliases). ``section=None`` means any section.
 
         Returns:
-            The entry, or ``None`` when nothing matches or ``name`` is blank.
+            The entry, or ``None`` when nothing matches, ``name`` is blank or either argument
+            cannot be encoded to UTF-8 (a lone surrogate).
         """
-        if not name.strip():
+        if not name.strip() or not is_encodable(name) or not is_encodable(section or ""):
             return None
         with self._reading() as conn:
             row = conn.execute(_ENTRY_BY_NAME, (name, section, section)).fetchone()

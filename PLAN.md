@@ -521,7 +521,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Injection tests.
 - Accept: `uv run pytest tests/unit/test_repo.py -q`; coverage of `store`/`repo` ≥90%; `make check`.
 
-- [ ] T-4.R Phase 4 review (RC)
+- [x] T-4.R Phase 4 review (RC)
 - Accept: review note; `make check`.
 
 ### Phase 5 — Search and library
@@ -538,12 +538,13 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - `SearchResult` with section/kind/origin.
   - `SearchResult` gains `via: str | None` (the matched intent text, D-029); intent tiers: exact phrase > all words > partial, then lower `ord` first.
   - `Searcher.nearest_names(query, limit=3) -> list[str]`: best `rapidfuzz` WRatio over names and aliases with no threshold, distinct names, ties by name; blank query → [].
+  - Repo facts (D-049): `Repository.names()` returns `NameRow(entry_id, name, section, kind, origin, summary, curated, aliases, intents)` ordered `(name, rank, id)`; `Repository.fts(query, limit)` returns `FtsHit(entry_id, score)` with `score = -bm25` (higher is better, ties by ascending entry id) using `FTS_WEIGHTS` (10, 5, 2, 1: name, intents, summary, body). FTS has no prefix search (`arch*` and `arch` find nothing, every token is a quoted whole-word phrase, at most 32 tokens): the prefix and fuzzy tiers come from `names()`. A text with a lone surrogate gives `[]`.
   - Tests: gold mini ≥ 27/30 in the top 3, typos (`gerp` → grep), case, multiple spaces, 1-char query, unicode/emoji, very long query, stable order.
 - Accept: `uv run pytest tests/unit/test_search.py -q`; coverage ≥90%; `make check`.
 
 - [ ] T-5.2 Search latency benchmark (NFR-2)
 - Files: `tests/integration/test_search_latency.py`.
-- Steps: 3000 synthetic entries via IndexWriter; 200 queries; p95 < 50 ms (CI-tolerant: assert < 100 ms, report the real p95).
+- Steps: 3000 synthetic entries via `with IndexWriter(path) as w: ...; w.finalize(built_at=<aware datetime>)` (`finalize` fills `search_fts`; an unfinalized index has an empty FTS table), read back through `Repository(open_readonly(path))` (D-047, D-048); 200 queries; p95 < 50 ms (CI-tolerant: assert < 100 ms, report the real p95).
 - Accept: `uv run pytest -m integration tests/integration/test_search_latency.py -q`; `make check`.
 
 - [ ] T-5.3 `leva.library`: Library facade
@@ -560,6 +561,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Examples: curated first, then tldr; duplicates merged by normalised command.
   - History max 50 with browser semantics.
   - `attribution()` from meta; `close()`.
+  - Repo facts (D-049): `Repository` has `get_entry_by_id(entry_id) -> Entry | None`, `explain(entry_id) -> str` (`""` when not curated or the id is unknown) and an idempotent `close()` that closes the connection; `meta()["attribution"]` holds the attribution text (written through `IndexWriter.set_meta`). `get_entry` does not strip the name (`"ls "` is `None`); multi-word input must be split by the library. Every `Repository` method raises `IndexUnavailableError` (hint `run leva --rebuild`) on a database or stored-value problem.
 - Accept: `uv run pytest tests/unit/test_library.py -q`; `make check`.
 
 - [ ] T-5.R Phase 5 review (RC)
@@ -575,7 +577,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - `Fingerprint(version_part, system_part)`:
     - version part = leva version, `content_version(default_root())` from `leva.content` (D-046), schema;
     - system part = macOS version and build, per-dir (count, max mtime) for man and bin dirs, config digest.
-  - Stored in meta.
+  - Stored in meta: the parts are written with `IndexWriter.set_meta` before `finalize`, so they are covered by the `index_digest` (D-048: every meta key except `built_at` and `index_digest`); read them back with `Repository.meta()`.
   - `staleness(index_db)`: missing or unreadable → MISSING; version mismatch → VERSION_CHANGED; system mismatch → SYSTEM_CHANGED; else FRESH.
   - Tests with fake SystemInfo and tmp dirs, one per cause.
 - Accept: `uv run pytest tests/unit/test_ingest_staleness.py -q`; `make check`.
@@ -626,6 +628,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
     - returns `BuildReport`;
     - meta also holds fingerprint parts and attribution.
   - `NullProgress`.
+  - Store facts (D-047, D-048): entries are `NewEntry(name, section, kind, origin, summary, path, has_man, curated, rank=0, explain="")` with `rank` computed by ingest (D-005); ids are assigned in write order (1, 2, 3, ...), so the write order (name, section, origin) fixes them; the child lists (`add_sections`, `add_examples`, `add_subcommands`, `add_notes`, `add_related`, `add_intents`) are called once per entry. Use `with IndexWriter(path) as w: ...; digest = w.finalize(built_at=clock())` (`clock()` timezone-aware; `digest` becomes `BuildReport.digest`); `IndexWriter(path)` raises `ValueError` when the file exists, so remove a stale `.new` first. A failed build rolls back and leaves the `.new` file with no tables and `user_version` 0: the builder removes it. Every writer failure is an `IngestError`.
   - Integration tests: full build on a fixture tree with FakeRenderer; same digest twice; old index kept on failure; lock contention; real-mandoc variant on synthetic pages.
 - Accept: `uv run pytest -m integration tests/integration/test_ingest_build.py -q`; coverage of `ingest` ≥90%; `make check`.
 
@@ -678,6 +681,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Refs: DITS §16; ADR-0004 §3; TEST-STRATEGY (verify row); D-016.
 - Steps:
   - `VerifyResult`.
+  - Repo facts (D-049): `Repository.examples(entry_id)` returns each `Example` with its `danger`; `Repository.stats()` is `IndexStats(entries, man_pages, builtins, curated, examples, subcommands)` with no per-verify-mode counts, so `--stats` counts modes itself.
   - `Verifier(repo, *, workdir, timeout, sandbox_exec="/usr/bin/sandbox-exec", allow_unsandboxed=False)`.
   - exec mode:
     - fresh `workdir/<id>/`; HOME and TMPDIR inside it; env minimal per DITS; `/bin/zsh -f -c`; stdin `/dev/null`;
@@ -856,7 +860,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 - Files: `src/leva/cli/_doctor.py`, `tests/integration/test_doctor.py`.
 - Refs: FR-20; DITS §15; D-015.
 - Steps:
-  - Checks: Python, SQLite/FTS5, mandoc, manpath, pbcopy, content loads (both `CuratedYamlProvider(default_root()).load()` and `TldrSnapshotProvider(default_root()).load()` drain without `ContentError`), index present/fresh/counts, versions.
+  - Checks: Python, SQLite/FTS5, mandoc, manpath, pbcopy, content loads (both `CuratedYamlProvider(default_root()).load()` and `TldrSnapshotProvider(default_root()).load()` drain without `ContentError`), index present/fresh/counts, versions. Counts come from `Repository.stats()` (`IndexStats(entries, man_pages, builtins, curated, examples, subcommands)`) and the versions from `Repository.meta()`; `open_readonly` raises `IndexUnavailableError` (hint `run leva --rebuild`) for a missing, unreadable or other-schema index.
   - Plain text, one check per line `ok|warn|fail name: detail`; exit 0 if no fail.
   - `--offline` per D-015.
 - Accept: `uv run pytest -m integration tests/integration/test_doctor.py -q`; `LEVA_HOME=$(mktemp -d) uv run leva doctor --offline` exits 0; `make check`.

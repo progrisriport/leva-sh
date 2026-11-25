@@ -626,6 +626,23 @@ def test_open_readonly_rejects_file_without_read_permission(tmp_path: Path) -> N
     assert isinstance(caught.value.__cause__, sqlite3.Error)
 
 
+def test_open_readonly_rejects_file_in_unsearchable_directory(tmp_path: Path) -> None:
+    folder = tmp_path / "locked"
+    folder.mkdir()
+    path = build_index(folder / "index.db")
+    folder.chmod(0o000)
+
+    try:
+        with pytest.raises(IndexUnavailableError) as caught:
+            open_readonly(path)
+    finally:
+        folder.chmod(0o700)
+
+    assert caught.value.message == f"index unreadable: {path}"
+    assert caught.value.hint == REBUILD_HINT
+    assert isinstance(caught.value.__cause__, OSError)
+
+
 @pytest.mark.parametrize("version", [0, 2])
 def test_open_readonly_rejects_other_schema_version(tmp_path: Path, version: int) -> None:
     path = tmp_path / "index.db"
@@ -684,6 +701,21 @@ def test_invalid_migration_raises_ingest_error_and_closes(
     assert caught.value.message == f"cannot write index: {path}"
     assert isinstance(caught.value.__cause__, sqlite3.Error)
     assert re.search(r"incomplete input|syntax error", str(caught.value.__cause__))
+
+
+def test_unreadable_migrations_create_no_file(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def fail() -> tuple[str, ...]:
+        raise ValueError("bad migration series")
+
+    monkeypatch.setattr("leva.store._writer.load_migrations", fail)
+    path = tmp_path / "index.db"
+
+    with pytest.raises(ValueError, match="bad migration series"), IndexWriter(path):
+        pass
+
+    assert not path.exists()
 
 
 def commit_inside(path: Path) -> None:

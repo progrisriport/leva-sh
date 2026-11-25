@@ -148,11 +148,13 @@ class IndexWriter:
         if self._entered:
             raise ValueError("index writer already entered")
         self._entered = True
+        # Read before connecting: a ValueError here must not leave a file or a connection behind.
+        script = "BEGIN;\n" + "\n".join(load_migrations())
         conn: sqlite3.Connection | None = None
         try:
             conn = sqlite3.connect(self._path, isolation_level=None)
             conn.execute("PRAGMA foreign_keys = ON")
-            conn.executescript("BEGIN;\n" + "\n".join(load_migrations()))
+            conn.executescript(script)
             conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
         except sqlite3.Error as exc:
             if conn is not None:

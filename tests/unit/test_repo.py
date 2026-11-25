@@ -449,6 +449,12 @@ NEUTRALISED_QUERIES = [
     "(" * 500,
     "{name}: ls",
     "- ls",
+    "NEAR/3",
+    "ls OR",
+    "“ls”",
+    "ls\\",
+    "\ud800",
+    "ls \udfff cat",
 ]
 
 
@@ -523,6 +529,33 @@ def test_fts_property_any_text_is_safe(shared_repo: Repository, text: str) -> No
     assert len(hits) <= 5
     if not text.replace("\x00", " ").split():
         assert hits == []
+
+
+# `st.text()` never draws surrogates, so these pieces add the characters that break UTF-8
+# encoding next to the ones FTS5 treats as syntax.
+HOSTILE_TEXT = st.lists(
+    st.sampled_from(["\ud800", "\udfff", "\x00", '"', "*", "-", ":", " ", "a", "ls"])
+).map("".join)
+
+
+@settings(max_examples=200)
+@given(HOSTILE_TEXT)
+def test_fts_property_hostile_alphabet_is_total(shared_repo: Repository, text: str) -> None:
+    assert len(shared_repo.fts(text, 5)) <= 5
+    assert (shared_repo.get_entry(text) is not None) == (text == "ls")
+
+
+@pytest.mark.parametrize("name", ["\ud800", "ls\udfff", "𐏿"])
+def test_fts_and_get_entry_with_an_unencodable_name_match_nothing(
+    repo: Repository, name: str
+) -> None:
+    assert repo.fts(name, 5) == []
+    assert repo.get_entry(name) is None
+    assert repo.get_entry("ls", section=name) is None
+
+
+def test_get_entry_with_a_nul_in_the_name_is_none(repo: Repository) -> None:
+    assert repo.get_entry("l\x00s") is None
 
 
 # --- errors ----------------------------------------------------------------------------------

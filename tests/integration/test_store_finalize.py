@@ -159,35 +159,103 @@ def test_digest_changes_when_content_changes(tmp_path: Path, change: dict[str, A
 # 4. recipe pin
 
 
+DIGEST_TABLES = (
+    "meta",
+    "entry",
+    "alias",
+    "doc_section",
+    "example",
+    "note",
+    "subcommand",
+    "related",
+    "intent",
+    "content_item",
+)
+
+
+def recipe_digest(rows: dict[str, list[list[Any]]]) -> str:
+    """Hash the rows by hand as D-048 describes: a `#table` line, then one JSON line per row."""
+    text = ""
+    for table in DIGEST_TABLES:
+        text += f"#{table}\n"
+        for row in rows.get(table, []):
+            text += json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n"
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def test_digest_follows_the_documented_recipe(tmp_path: Path) -> None:
     path = tmp_path / "index.db"
     with IndexWriter(path) as writer:
         writer.add_entry(entry("ls", "List files.", section="1", path="/bin/ls", has_man=True))
         digest = writer.finalize(built_at=BUILT_AT)
 
-    tables = (
-        "meta",
-        "entry",
-        "alias",
-        "doc_section",
-        "example",
-        "note",
-        "subcommand",
-        "related",
-        "intent",
-        "content_item",
+    assert digest == recipe_digest(
+        {
+            "meta": [["schema_version", "1"]],
+            "entry": [[1, "ls", "1", "executable", "macos", "List files.", "/bin/ls", 1, 0, "", 0]],
+        }
     )
-    rows = {
-        "meta": [["schema_version", "1"]],
-        "entry": [[1, "ls", "1", "executable", "macos", "List files.", "/bin/ls", 1, 0, "", 0]],
-    }
-    text = ""
-    for table in tables:
-        text += f"#{table}\n"
-        for row in rows.get(table, []):
-            text += json.dumps(row, ensure_ascii=False, separators=(",", ":")) + "\n"
 
-    assert digest == hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+def test_digest_recipe_covers_every_child_table(tmp_path: Path) -> None:
+    path = tmp_path / "index.db"
+    with IndexWriter(path) as writer:
+        first = writer.add_entry(
+            entry(
+                "ls",
+                "List files.",
+                section="1",
+                path="/bin/ls",
+                has_man=True,
+                curated=True,
+                explain="Explain.",
+                rank=3,
+            )
+        )
+        writer.add_alias(first, "vdir")
+        writer.add_alias(first, "dir")
+        writer.add_sections(first, [Section("NAME", "ls - list", 0), Section("BODY", "ünï", 1)])
+        writer.add_examples(
+            first,
+            [
+                Example("ls-a", "all", "ls -a", "curated", "exec", "removes nothing"),
+                Example("ls-b", "b", "ls -b", "tldr", "none"),
+            ],
+        )
+        writer.add_subcommands(
+            first,
+            [
+                Subcommand("sub", "A sub.", None, "hyphen", "sub body"),
+                Subcommand("c", "C", "cat", "hyphen", "body"),
+            ],
+        )
+        writer.add_notes(first, [Note("macos", "a note")])
+        writer.add_related(first, ["cat", "find"])
+        writer.add_intents(first, ["list files", "show folder"])
+        writer.set_meta("content_version", "abc")
+        digest = writer.finalize(built_at=BUILT_AT)
+
+    assert digest == recipe_digest(
+        {
+            "meta": [["content_version", "abc"], ["schema_version", "1"]],
+            "entry": [
+                [1, "ls", "1", "executable", "macos", "List files.", "/bin/ls", 1, 1, "Explain.", 3]
+            ],
+            "alias": [[1, "dir"], [1, "vdir"]],
+            "doc_section": [[1, 0, "NAME", "ls - list"], [1, 1, "BODY", "ünï"]],
+            "example": [
+                [1, 0, "ls-a", "all", "ls -a", "curated", "exec", "removes nothing"],
+                [1, 1, "ls-b", "b", "ls -b", "tldr", "none", None],
+            ],
+            "subcommand": [
+                [1, 0, "sub", "A sub.", None, "hyphen", "sub body"],
+                [1, 1, "c", "C", "cat", "hyphen", "body"],
+            ],
+            "note": [[1, 0, "macos", "a note"]],
+            "related": [[1, 0, "cat"], [1, 1, "find"]],
+            "intent": [[1, 0, "list files"], [1, 1, "show folder"]],
+        }
+    )
 
 
 # 5. FTS

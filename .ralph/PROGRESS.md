@@ -225,3 +225,11 @@
 - For T-7.3/T-9.3: `stats()` -> `IndexStats(entries, man_pages (has_man and not builtin), builtins, curated, examples, subcommands)`.
 - Errors: every `sqlite3.Error` -> `IndexUnavailableError("index unreadable")`, a value the model rejects -> `"index corrupt: <table> row <entry_id>"`, both with hint `run leva --rebuild`.
 - Reviewer: tightened the colon test (raw FTS5 does apply `name:`/`body:`/`summary:` filters on the fixture; sanitised queries return `[]`) and made the `close()` idempotence test assert the closed state; ticked PLAN (`_repository.py`, `test_repo_fts.py` added to Files).
+
+## 2026-11-25T03:21:59Z T-4.R Phase 4 review (RC) — DONE
+- Note `docs/design/leva-sh/reviews/phase-4.md`: RC 1–10 ok; F-1..F-6 fixed. F-1: lone surrogates made `fts` (`[]`) and `get_entry` (`None`) total via private `repo/_text.is_encodable`; F-2: `open_readonly` maps an `OSError` from `path.is_file()` (unsearchable parent) to `IndexUnavailableError("index unreadable: ...")`; F-3: `IndexWriter.__enter__` reads migrations before connecting (no leaked file/connection on `ValueError`).
+- Tests added: digest recipe pin over every child table (F-4), `tests/integration/test_store_repo_roundtrip.py` (F-5, TEST-STRATEGY §4), hostile-alphabet Hypothesis property incl. surrogates/NUL, operator look-alikes (`NEAR/3`, `x OR`, curly quotes).
+- Amendments: D-047 (F-2, F-3), D-048 (recipe pin, digest facts), D-049 (surrogate totality, integer args unguarded beyond `limit >= 1`, facts for later phases).
+- R10 edits: T-5.1 (`NameRow`, `FtsHit.score` higher is better, no FTS prefix search), T-5.2 (writer + finalize + `Repository(open_readonly(...))`), T-5.3 (`get_entry_by_id`, `explain`, `close`, `meta()["attribution"]`), T-6.1 (fingerprint via `set_meta` before finalize, part of the digest), T-6.5 (`NewEntry`, ids by write order, remove stale/rolled-back `.new`), T-7.3/T-9.3 (`stats()` fields).
+- For T-5.x: `get_entry` does not strip or split input; the library must. For T-6.5: `IndexWriter(path)` raises `ValueError` if the file exists.
+- Reviewer round 1: approved; reworded the F-6 note again (the executor's text still implied `--color` is GNU-only; macOS `ls` accepts `--color=when`, GNU reads `-G` as `--no-group`). `make check` 1499 passed; `make py311` 1499 passed.

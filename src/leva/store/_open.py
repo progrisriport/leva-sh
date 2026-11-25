@@ -31,11 +31,15 @@ def open_readonly(path: Path) -> sqlite3.Connection:
         An open connection that rejects writes. The caller owns it and closes it.
 
     Raises:
-        IndexUnavailableError: If the file is missing, is not a readable SQLite database or
-            has a ``user_version`` other than ``SCHEMA_VERSION``; the hint is
-            ``run leva --rebuild``.
+        IndexUnavailableError: If the file is missing, is not a readable SQLite database (also
+            when a parent directory cannot be searched) or has a ``user_version`` other than
+            ``SCHEMA_VERSION``; the hint is ``run leva --rebuild``.
     """
-    if not path.is_file():
+    try:
+        is_file = path.is_file()
+    except OSError as exc:
+        raise _unavailable(f"index unreadable: {path}") from exc
+    if not is_file:
         raise _unavailable(f"index missing: {path}")
     try:
         conn = sqlite3.connect(path.absolute().as_uri() + "?mode=ro", uri=True)

@@ -1218,7 +1218,7 @@
    "notes": [
     {
      "kind": "bsd-gnu",
-     "text": "The macOS version has no long option names; the color switch is a capital G."
+     "text": "Here -G turns on color; GNU ls reads -G as --no-group and colors only with --color."
     }
    ],
    "related": [

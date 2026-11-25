@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Final
 
+from leva.repo._text import is_encodable
+
 MAX_FTS_TOKENS: Final = 32
 
 
@@ -19,8 +21,11 @@ def fts_query(text: str) -> str | None:
         text: Raw query as typed by the user.
 
     Returns:
-        The expression, or ``None`` when the text holds no token.
+        The expression, or ``None`` when the text holds no token or cannot be encoded to UTF-8
+        (a lone surrogate: nothing in the index can match it, and SQLite could not bind it).
     """
+    if not is_encodable(text):
+        return None
     tokens = text.replace("\x00", " ").split()[:MAX_FTS_TOKENS]
     if not tokens:
         return None

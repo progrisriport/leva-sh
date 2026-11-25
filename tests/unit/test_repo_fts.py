@@ -44,6 +44,25 @@ def test_fts_query_returns_none_without_tokens(text: str) -> None:
     assert fts_query(text) is None
 
 
+@pytest.mark.parametrize("text", ["\ud800", "ls\udfff", "git \ud800 commit", '"\ud800"'])
+def test_fts_query_returns_none_for_text_that_cannot_be_encoded(text: str) -> None:
+    assert fts_query(text) is None
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("NEAR/3", '"NEAR/3"'),
+        ("{name}: x", '"{name}:" "x"'),
+        ("x OR", '"x" "OR"'),
+        ("“x”", '"“x”"'),
+        ("a\\b", '"a\\b"'),
+    ],
+)
+def test_fts_query_keeps_operator_look_alikes_as_plain_text(text: str, expected: str) -> None:
+    assert fts_query(text) == expected
+
+
 def test_fts_query_keeps_only_the_first_tokens() -> None:
     words = [f"w{i}" for i in range(MAX_FTS_TOKENS + 20)]
 
