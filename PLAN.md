@@ -507,8 +507,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Fixture `fixture_index(tmp_path)` in conftest.
 - Accept: `uv run pytest tests/unit/test_index_factory.py -q`; `make check`.
 
-- [ ] T-4.4 `leva.repo`: Repository
-- Files: `src/leva/repo/{__init__.py,_rows.py,_fts.py}`, `tests/unit/test_repo.py`.
+- [x] T-4.4 `leva.repo`: Repository
+- Files: `src/leva/repo/{__init__.py,_rows.py,_fts.py,_repository.py}`, `tests/unit/{test_repo.py,test_repo_fts.py}`.
 - Refs: DITS §10; D-005, D-010, D-029, D-030, D-033.
 - Steps:
   - `NameRow(entry_id, name, section, kind, origin, summary, curated, aliases, intents)`, `FtsHit(entry_id, score)`, `IndexStats`.

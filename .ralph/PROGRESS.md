@@ -217,3 +217,11 @@
 - `find` DESCRIPTION has >=120 lines with a line >80 chars (D-027). `diskutil` subcommands: 4 `section` verbs with body + `eraseDisk` with source `curated`; `git`: `commit`/`log` (`hyphen`, entry_name set), `status` (`probe`).
 - The fixture's D-005 rank test treats every origin other than `bash` as equal to `zsh`; T-6.5 should record its own origin order if it differs.
 - Reviewer fix: the loader coerced values with `str()`/`bool()` and validated with `assert` (`"summary": null` became `"None"`, `"has_man": "false"` became True); now typed accessors raise `ValueError`, with parametrized tests. PLAN Files gained `tests/conftest.py`.
+
+## 2026-11-25T03:10:32Z T-4.4 `leva.repo`: Repository — DONE
+- `leva.repo`: `Repository(conn)` (owns the connection from `open_readonly`), `NameRow`, `FtsHit`, `IndexStats`, `FTS_WEIGHTS` (10, 5, 2, 1), `MAX_FTS_TOKENS` (32); private sanitiser `_fts.fts_query` (NUL counts as whitespace, every token quoted, `"` doubled). D-049 records orderings, messages and the sanitiser. Repo branch coverage 100%.
+- For T-5.1: `NameRow(entry_id, name, section, kind, origin, summary, curated, aliases sorted, intents by ord)`, `names()` ordered `(name, rank, id)`. `fts` returns `FtsHit(entry_id, score=-bm25)`: higher is better, ordered by descending score then entry id. There is no prefix search in FTS (`arch*` and `arch` find nothing), so prefix/fuzzy matching must come from `names()`; `name:ls` is the phrase `name ls`, never a column filter; `git-commit` is a phrase.
+- For T-5.3: `get_entry_by_id`, `explain` (`""` when not curated) and `close()` (idempotent) exist beyond DITS §10; unknown ids give `None`/`""`/`[]`. `get_entry` does not strip the name (`"ls "` is None) and a blank name is None.
+- For T-7.3/T-9.3: `stats()` -> `IndexStats(entries, man_pages (has_man and not builtin), builtins, curated, examples, subcommands)`.
+- Errors: every `sqlite3.Error` -> `IndexUnavailableError("index unreadable")`, a value the model rejects -> `"index corrupt: <table> row <entry_id>"`, both with hint `run leva --rebuild`.
+- Reviewer: tightened the colon test (raw FTS5 does apply `name:`/`body:`/`summary:` filters on the fixture; sanitised queries return `[]`) and made the `close()` idempotence test assert the closed state; ticked PLAN (`_repository.py`, `test_repo_fts.py` added to Files).
