@@ -547,8 +547,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 - Steps: 3000 synthetic entries via `with IndexWriter(path) as w: ...; w.finalize(built_at=<aware datetime>)` (`finalize` fills `search_fts`; an unfinalized index has an empty FTS table), read back through `Repository(open_readonly(path))` (D-047, D-048); 200 queries; p95 < 50 ms (CI-tolerant: assert < 100 ms, report the real p95).
 - Accept: `uv run pytest -m integration tests/integration/test_search_latency.py -q`; `make check`.
 
-- [ ] T-5.3 `leva.library`: Library facade
-- Files: `src/leva/library/{__init__.py,_card.py,_history.py}`, `tests/unit/test_library.py`.
+- [x] T-5.3 `leva.library`: Library facade
+- Files: `src/leva/library/{__init__.py,_card.py,_history.py,_library.py}`, `tests/unit/test_library.py`.
 - Refs: DITS §12; DESIGN-PATTERNS (library); D-011; D-031.
 - Steps:
   - `Card`.
@@ -775,6 +775,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
   - Breadcrumb (click goes back); Backspace and Alt+Left go back; forward.
   - Overview: summary, explain, notes by kind, origin/path/section, "no manual entry" when needed.
   - Two-pane layout at ≥100 cols (CardView preview in SearchScreen), single pane at 60–99.
+  - Library facts (D-051): `Library.card(entry_id)` builds the preview without touching history; `open_result(entry_id)` opens from Results and resets history (D-028); `open(name)`/`open_subcommand(card, sub)` grow it; `back()`/`forward()` return `None` at the ends; the breadcrumb is `search` + `' '.join(c.breadcrumb)` of each card in `trail()`; the lead line is `Card.summary`.
 - Accept: `uv run pytest tests/tui/test_card_screen.py -q`; `make check`.
 
 - [ ] T-8.6 Examples tab and copy
@@ -792,6 +793,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 - Files: `src/leva/tui/widgets/{subcommand_list.py,related_list.py}`, `tests/tui/test_subcommands_related.py`.
 - Refs: FR-8, FR-15; D-011.
 - Steps: Enter/click opens a subcommand (synthesized card when it has no page) or a related entry; breadcrumb updates; back works.
+  - Library facts (D-051): `open_subcommand(card, sub)` matches `sub` exactly against `card.subcommands` and returns the page card (breadcrumb `(parent, sub)`) or a synthesized one (`entry` = parent, `sections` = `DESCRIPTION` with the subcommand body, examples starting with `parent sub`); related names open with `open(name)`.
 - Accept: `uv run pytest tests/tui/test_subcommands_related.py -q`; `make check`.
 
 - [ ] T-8.8 Manual tab
