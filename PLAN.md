@@ -526,8 +526,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 ### Phase 5 — Search and library
 
-- [ ] T-5.1 `leva.search`: Searcher
-- Files: `src/leva/search/{__init__.py,_ranking.py}`, `tests/unit/test_search.py`, `tests/fixtures/index/gold_mini.json` (30 queries).
+- [x] T-5.1 `leva.search`: Searcher
+- Files: `src/leva/search/{__init__.py,_ranking.py,_searcher.py}`, `tests/unit/test_search.py`, `tests/fixtures/index/gold_mini.json` (30 queries).
 - Refs: DITS §11; ADR-0003; D-010; D-029 (intent ranking + `via`); D-031
 - Steps:
   - `Weights`/`DEFAULT_WEIGHTS`.
@@ -764,6 +764,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
   - Rows: name, origin/section tag (secondary), summary (secondary); selected row bold+accent.
   - Navigation: Up/Down, j/k, PgUp/PgDn, g/G; Enter/click opens.
   - StartTarget `query` resolution per D-012.
+  - Search facts (D-050): results come from `Library.search` as `SearchResult(entry_id, name, section, kind, origin, summary, score, why, via)`; show `via: <intent>` when `via` is not None; several results can share a name (echo zsh/bash/macos), so open a result by `entry_id`, never by name.
 - Accept: `uv run pytest tests/tui/test_search_screen.py -q` (type a query, see results, arrows, Enter opens the card, click on a row); `make check`.
 
 - [ ] T-8.5 CardView, CardScreen, Overview tab, history
