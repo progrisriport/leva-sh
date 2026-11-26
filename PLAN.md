@@ -542,7 +542,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Tests: gold mini ≥ 27/30 in the top 3, typos (`gerp` → grep), case, multiple spaces, 1-char query, unicode/emoji, very long query, stable order.
 - Accept: `uv run pytest tests/unit/test_search.py -q`; coverage ≥90%; `make check`.
 
-- [ ] T-5.2 Search latency benchmark (NFR-2)
+- [x] T-5.2 Search latency benchmark (NFR-2)
 - Files: `tests/integration/test_search_latency.py`.
 - Steps: 3000 synthetic entries via `with IndexWriter(path) as w: ...; w.finalize(built_at=<aware datetime>)` (`finalize` fills `search_fts`; an unfinalized index has an empty FTS table), read back through `Repository(open_readonly(path))` (D-047, D-048); 200 queries; p95 < 50 ms (CI-tolerant: assert < 100 ms, report the real p95).
 - Accept: `uv run pytest -m integration tests/integration/test_search_latency.py -q`; `make check`.
