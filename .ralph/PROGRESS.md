@@ -285,3 +285,11 @@
 - For T-6.5: `Catalog.entries` is already in write order (ids 1, 2, 3, ...); `Catalog.skipped` is separate from `PageSet.skipped` and must be merged into the build report. The builtins of a name (section `""`) are written before its man entries.
 - Warning: an executable whose name equals a builtin but has no man page (e.g. `/bin/test` without `test(1)`) gives no path anywhere: builtins never get a path (D-005).
 - Reviewer round 1: approved without code changes; smoke-checked `build_catalog` on `tests/fixtures/man/builtins_zsh.txt`/`builtins_bash.txt` (15 entries, no error).
+
+## 2026-11-27T06:12:51Z T-6.4 `leva.ingest` (D): enrichment — DONE
+- `leva.ingest._enrich`: `NOT_INSTALLED`, `DEFAULT_EXTRACTORS` (section, hyphen), `Prober` (Protocol), `ProbeFactory` (`Callable[[Mapping[str, tuple[str, ...]]], Prober]`), `Enrichment(entries, skipped, curated)`, `probe_allowlist`, `known_pages`, `enrich`. D-055 records the 8-step order and every rule. Not re-exported yet (T-6.5 does it). Ingest branch coverage 100%.
+- For T-6.5: `enrich(entries, *, curated, tldr, executables, probe_factory, progress, extractors=DEFAULT_EXTRACTORS)`; pass `probe_factory=ProbeRunner` (its constructor takes the allowlist); merge `Enrichment.skipped` into `BuildReport.skipped` next to `PageSet.skipped` and `Catalog.skipped`. `enrich` calls `progress.phase("enrich", n)` itself and one `advance` per entry; probe failures arrive as `progress.warn(<IngestError message>)`.
+- `Enrichment.entries` keeps the input (key/write) order; ranks are recomputed so a curated entry is rank 0 of its name. The curated summary replaces the man summary, also in `KnownPage.summary` (so a hyphen subcommand pointing at a curated page carries the curated lead line).
+- Target choice is exact name (+ section when set), no alias lookup: a curated command named after an alias only is reported as not installed.
+- `tests/support/ingest_fakes.py`: `FakeProber(texts, failing=)` with `factory`, `allowlists`, `calls`.
+- Executor round 2 had no Bash; the reviewer ran the tests and `make check`. Reviewer: replaced two `type: ignore`s in the test helpers with typed parameters (`VerifyMode`, explicit keyword fields); ticked PLAN (support file and D-055 added to the task) and wrote this entry. `make check` 1838 passed, 11 deselected, coverage gate passed.

@@ -1,4 +1,4 @@
-"""Test doubles for the ingest pipeline: a fake renderer, progress sink and cancel token."""
+"""Test doubles for ingest: a fake renderer, progress sink, cancel token and help prober."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import threading
 from collections.abc import Callable, Collection, Mapping, Sequence
 from pathlib import Path
 
-from leva.model import ManRenderError
+from leva.model import IngestError, ManRenderError
 
 
 def rendered_page(
@@ -109,3 +109,30 @@ class FakeCancel:
 
     def is_set(self) -> bool:
         return self.flag
+
+
+class FakeProber:
+    """`Prober` for tests: help texts by name; names in `failing` raise `IngestError`.
+
+    Attributes:
+        allowlists: Every allowlist the factory received.
+        calls: Names passed to `run`, in call order.
+    """
+
+    def __init__(self, texts: Mapping[str, str], failing: Collection[str] = ()) -> None:
+        self._texts = dict(texts)
+        self._failing = frozenset(failing)
+        self.allowlists: list[dict[str, tuple[str, ...]]] = []
+        self.calls: list[str] = []
+
+    def factory(self, allowlist: Mapping[str, tuple[str, ...]]) -> FakeProber:
+        """Record `allowlist` and return this prober (a `ProbeFactory`)."""
+        self.allowlists.append(dict(allowlist))
+        return self
+
+    def run(self, command: str) -> str:
+        """Record the call, then fail or return the text of `command`."""
+        self.calls.append(command)
+        if command in self._failing:
+            raise IngestError(f"probe failed: {command}")
+        return self._texts[command]
