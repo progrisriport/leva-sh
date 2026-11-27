@@ -55,6 +55,7 @@ MAX_ORD: Final = 30
 FTS_SCALE: Final = 10.0  # bm25 value at which the FTS sub-score reaches half of its maximum
 
 _MIN_TIER_GAP: Final = 1000.0
+_MAX_TIER: Final = 1e9  # keeps float spacing far below the 1-point resolution of sub-scores
 _MAX_BONUS_SUM: Final = 50.0
 _WORD: Final = re.compile(r"\w+")
 
@@ -80,8 +81,9 @@ class Weights:
         builtin_bonus: Added to shell builtins.
 
     Raises:
-        ValueError: If the tiers are not strictly decreasing by at least 1000 each, or a bonus is
-            negative, or the bonuses sum to more than 50.
+        ValueError: If the tiers are not strictly decreasing by at least 1000 each, the best tier
+            exceeds 1e9 (or is not finite), a bonus is negative, or the bonuses sum to more
+            than 50.
     """
 
     exact: float = 7000.0
@@ -108,6 +110,8 @@ class Weights:
             raise ValueError(f"tiers must decrease by at least {_MIN_TIER_GAP:g}: {tiers!r}")
         if not self.body >= _MIN_TIER_GAP:
             raise ValueError(f"body must be at least {_MIN_TIER_GAP:g}: {self.body!r}")
+        if not self.exact <= _MAX_TIER:
+            raise ValueError(f"exact must be at most {_MAX_TIER:g}: {self.exact!r}")
         bonuses = (self.curated_bonus, self.builtin_bonus)
         if not (min(bonuses) >= 0 and sum(bonuses) <= _MAX_BONUS_SUM):
             raise ValueError(f"bonuses must be >= 0 and sum to <= {_MAX_BONUS_SUM:g}: {bonuses!r}")

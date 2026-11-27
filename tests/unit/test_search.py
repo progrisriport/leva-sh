@@ -16,6 +16,7 @@ from rapidfuzz import fuzz
 from leva.model import IndexUnavailableError, Kind, Origin
 from leva.repo import FtsHit, NameRow, Repository
 from leva.search import DEFAULT_WEIGHTS, STOPWORDS, MatchReason, Searcher, SearchResult, Weights
+from leva.search._ranking import MAX_ORD, intent_match
 from leva.store import open_readonly
 from tests.support.index_factory import FIXTURE_JSON, build_fixture_index
 
@@ -275,6 +276,43 @@ def test_custom_weights_are_honoured(repo: Repository) -> None:
     assert first(Searcher(repo, weights=weights).search("ls")).score == 7000 + 800 + 20
 
 
+@pytest.mark.parametrize("bonuses", [(50.0, 0.0), (0.0, 50.0), (25.0, 25.0), (0.0, 0.0)])
+@pytest.mark.parametrize("query", ["ls", "cd", "gerp", "compress a folder", "files", "echo"])
+def test_the_largest_bonuses_never_lift_a_result_into_a_better_tier(
+    repo: Repository, query: str, bonuses: tuple[float, float]
+) -> None:
+    weights = Weights(curated_bonus=bonuses[0], builtin_bonus=bonuses[1])
+    results = Searcher(repo, weights=weights).search(query)
+    name_tiers = {"exact", "prefix", "fuzzy"}
+    allowed = {
+        "name": name_tiers,
+        "alias": name_tiers,
+        "intent": {"intent", "partial"},
+        "summary": {"summary"},
+        "body": {"body"},
+    }
+
+    assert results
+    for result in results:
+        assert band_of(result.score) in allowed[result.why], (query, bonuses, result)
+
+
+def test_intent_sub_scores_keep_phrase_above_all_words_above_partial() -> None:
+    """D-029: no ord penalty and no bonus (<= 50) can invert phrase > all words > partial."""
+    positions = range(MAX_ORD * 2)  # past MAX_ORD the penalty stops growing
+    phrase = [intent_match(("a", "b"), ("a", "b"), ("a", "b"), pos) for pos in positions]
+    every = [intent_match(("a", "b"), ("a", "b"), ("a", "b", "c"), pos) for pos in positions]
+    some = [intent_match(("a", "b"), ("a", "b"), ("a", "c"), pos) for pos in positions]
+
+    assert all(m is not None and m.tier == "intent" for m in phrase + every)
+    assert all(m is not None and m.tier == "partial" for m in some)
+    lowest_phrase = min(m.sub for m in phrase if m)
+    highest_all_words = max(m.sub for m in every if m)
+    assert lowest_phrase > highest_all_words + 50
+    assert all(0 <= m.sub < 900 for m in phrase + every + some if m)
+    assert [m.sub for m in phrase if m] == sorted((m.sub for m in phrase if m), reverse=True)
+
+
 # --- dedup, limit, stability ----------------------------------------------------------------
 
 
@@ -348,6 +386,40 @@ def test_search_invariants_hold_for_any_text(
     for result in results:
         assert result.why in get_args(MatchReason)
         assert (result.via is not None) == (result.why == "intent")
+
+
+HOSTILE = st.text(
+    alphabet=st.sampled_from(
+        [
+            "a",
+            "g",
+            "l",
+            "s",
+            " ",
+            "\t",
+            "-",
+            "\x00",
+            "\ud800",
+            "\udfff",
+            "\U0001f642",
+            "ß",
+            '"',
+            "*",
+        ]
+    ),
+    max_size=40,
+)
+
+
+@given(query=HOSTILE, limit=st.integers(min_value=1, max_value=5))
+def test_search_and_nearest_names_are_total_over_hostile_text(
+    module_index: Searcher, query: str, limit: int
+) -> None:
+    results = module_index.search(query, limit=limit)
+
+    assert len(results) <= limit
+    assert len({result.entry_id for result in results}) == len(results)
+    assert len(module_index.nearest_names(query, limit=limit)) <= limit
 
 
 # --- FTS candidates -------------------------------------------------------------------------
@@ -458,6 +530,9 @@ def test_default_weights_are_valid_and_ordered() -> None:
         {"builtin_bonus": -0.5},
         {"curated_bonus": 40.0, "builtin_bonus": 20.0},
         {"exact": float("nan")},
+        {"exact": float("inf")},
+        {"exact": 1e18, "prefix": 1e18 - 1e4},
+        {"curated_bonus": float("nan")},
     ],
 )
 def test_invalid_weights_are_rejected(kwargs: dict[str, float]) -> None:

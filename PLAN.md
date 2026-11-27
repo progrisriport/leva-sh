@@ -564,7 +564,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Repo facts (D-049): `Repository` has `get_entry_by_id(entry_id) -> Entry | None`, `explain(entry_id) -> str` (`""` when not curated or the id is unknown) and an idempotent `close()` that closes the connection; `meta()["attribution"]` holds the attribution text (written through `IndexWriter.set_meta`). `get_entry` does not strip the name (`"ls "` is `None`); multi-word input must be split by the library. Every `Repository` method raises `IndexUnavailableError` (hint `run leva --rebuild`) on a database or stored-value problem.
 - Accept: `uv run pytest tests/unit/test_library.py -q`; `make check`.
 
-- [ ] T-5.R Phase 5 review (RC)
+- [x] T-5.R Phase 5 review (RC)
 - Accept: review note; `make check`.
 
 ### Phase 6 — Ingest

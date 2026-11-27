@@ -7,6 +7,8 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
+from hypothesis import given
+from hypothesis import strategies as st
 
 from leva.library import HISTORY_LIMIT, Card, Library
 from leva.library._card import example_key, merge_examples, subcommand_examples
@@ -302,6 +304,52 @@ def test_history_drops_the_oldest_cards_first(lib: Library) -> None:
     expected = [(names[index % len(names)],) for index in range(5, 55)]
 
     assert crumbs(lib.trail()) == expected
+
+
+@pytest.fixture(scope="module")
+def module_library(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Library]:
+    library = make_library(build_fixture_index(tmp_path_factory.mktemp("library") / "index.db"))
+    yield library
+    library.close()
+
+
+@given(
+    name=st.text(
+        alphabet=st.sampled_from(
+            ["g", "i", "t", "c", " ", "\t", "-", "\x00", "\ud800", "\U0001f642", "ß", '"', "*"]
+        ),
+        max_size=40,
+    )
+)
+def test_open_is_total_over_hostile_text(module_library: Library, name: str) -> None:
+    before = module_library.trail()
+
+    card = module_library.open(name)
+
+    if card is None:
+        assert module_library.trail() == before
+    else:
+        assert module_library.trail()[-1] == card
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "a" * 10_000,
+        "git " * 2_500,
+        "\x00",
+        "\ud800 commit",
+        "!!!",
+        "\U0001f642",
+        "git \x00",
+        "-" * 50,
+    ],
+)
+def test_open_returns_none_for_hostile_text_without_touching_history(
+    lib: Library, name: str
+) -> None:
+    assert lib.open(name) is None
+    assert lib.trail() == ()
 
 
 # --- delegation, attribution, close --------------------------------------------------------

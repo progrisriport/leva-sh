@@ -255,3 +255,11 @@
 - For T-8.7: a synthesized subcommand card keeps the parent `entry` (so `entry.id` is the parent's), `explain` `""`, one `DESCRIPTION` section or none, examples filtered on a word boundary from the parent's merged examples.
 - Warning: `open` is exact and case-sensitive and does not strip flags; D-012 query resolution (`ls -la`) belongs to the TUI/search side, not `open`.
 - Reviewer: typed the test helper with `ExampleSource` instead of a `type: ignore`; ticked PLAN (`_library.py` added to Files) and wrote this entry (the executor left both undone). `make check` 1646 passed.
+
+## 2026-11-27T01:10:20Z T-5.R Phase 5 review (RC) — DONE
+- Note `docs/design/leva-sh/reviews/phase-5.md`: RC 1–10 ok; F-1..F-4 fixed. F-1: `Weights` accepted `exact=inf` and spreads near 1e18 (float spacing above ~1e15 collapses tiers into ties); now `exact <= 1e9` is required (`_MAX_TIER`). F-2: `Library` class docstring now lists `ValueError` for `limit < 1`. F-4: D-050 amendment names the PLAN T-5.1 lines it refines (the `partial` tier, the `(name, names() position)` tie-break).
+- F-3 tests: largest bonuses never lift a result into another tier band (6 queries x 4 bonus splits), phrase > all words > partial over every `ord` incl. past `MAX_ORD`, Hypothesis totality of `search`/`nearest_names` and of `Library.open` over a hostile alphabet (NUL, lone surrogates, emoji, quotes), explicit hostile names for `open`. No production behaviour change besides F-1.
+- Kept on purpose: `search(limit=10**30)` raises `OverflowError` from sqlite (D-049); distance-1 fuzzy on 3-letter queries (`cat` -> `cut`); `open` exact, case-sensitive, no flag stripping (D-012 resolution belongs to the TUI side, T-8.x).
+- Gold mini 30/30 on the fixture, no query swapped. R10 edits: none (T-8.4/T-8.5/T-8.7 lines already match the code). Phase 6 ingest does not use `search`/`library`; T-8.x and T-9.2 rely on the T-5.1/T-5.3 entries above.
+- Warning: the executor saw one failure of `test_sources_probe.py::test_timeout_kills_process_group_and_removes_temp_dir` under load (passed alone and in the reviewer's `make check`); quarantine it with a reason if it repeats.
+- Reviewer round 1: approved; filled the baseline line of the note and recorded the reviewer `make check` (1687 passed, 11 deselected, coverage gate passed).

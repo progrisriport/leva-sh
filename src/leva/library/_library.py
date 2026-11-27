@@ -13,8 +13,9 @@ class Library:
     """Read API over an index for the UI.
 
     History lives in the instance: `open`, `open_result` and `open_subcommand` record the card
-    they return, `card` never does. Every method raises only ``IndexUnavailableError`` for a
-    database problem (hint ``run leva --rebuild``).
+    they return, `card` never does. A database problem raises ``IndexUnavailableError`` (hint
+    ``run leva --rebuild``); ``search`` and ``nearest_names`` also raise ``ValueError`` for
+    ``limit < 1``.
     """
 
     def __init__(self, repo: Repository, searcher: Searcher) -> None:
