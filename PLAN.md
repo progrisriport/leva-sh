@@ -582,8 +582,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Tests with fake SystemInfo and tmp dirs, one per cause.
 - Accept: `uv run pytest tests/unit/test_ingest_staleness.py -q`; `make check`.
 
-- [ ] T-6.2 `leva.ingest` (B): page pipeline
-- Files: `src/leva/ingest/_pipeline.py`, `tests/unit/test_ingest_pipeline.py`.
+- [x] T-6.2 `leva.ingest` (B): page pipeline
+- Files: `src/leva/ingest/_pipeline.py`, `src/leva/ingest/_progress.py`, `tests/support/ingest_fakes.py`, `tests/unit/test_ingest_pipeline.py`.
 - Refs: DITS §13; ADR-0002 §3, §8; NFR-12.
 - Steps:
   - Dedup ManFiles per D-005.
