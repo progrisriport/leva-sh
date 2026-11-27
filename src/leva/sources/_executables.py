@@ -67,6 +67,11 @@ class ExecutableScanner:
         """
         self._dirs = tuple(dict.fromkeys(dirs))
 
+    @property
+    def dirs(self) -> tuple[Path, ...]:
+        """The scanned directories, deduplicated, in search order."""
+        return self._dirs
+
     def scan(self) -> Iterator[Executable]:
         """Yield the executables, sorted by name and then by directory position.
 

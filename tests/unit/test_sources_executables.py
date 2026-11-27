@@ -170,3 +170,9 @@ def test_scan_skips_unreadable_dir(tmp_path: Path) -> None:
     make_file(good, "ok")
     with unreadable(locked):
         assert names(ExecutableScanner([locked, good])) == ["ok"]
+
+
+def test_dirs_property_is_deduplicated_in_order(tmp_path: Path) -> None:
+    first, second = tmp_path / "a", tmp_path / "b"
+    scanner = ExecutableScanner([first, second, first])
+    assert scanner.dirs == (first, second)

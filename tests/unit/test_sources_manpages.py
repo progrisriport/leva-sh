@@ -316,3 +316,14 @@ def test_man_file_is_frozen_and_slotted() -> None:
     with pytest.raises(dataclasses.FrozenInstanceError):
         man.name = "x"  # type: ignore[misc]  # frozen dataclass: assignment must fail
     assert not hasattr(man, "__dict__")
+
+
+def test_dirs_property_is_deduplicated_in_order(tmp_path: Path) -> None:
+    first, second = tmp_path / "a", tmp_path / "b"
+    locator = ManPageLocator([first, second, first])
+    assert locator.dirs == (first, second)
+
+
+def test_sections_property_returns_the_given_sections() -> None:
+    assert ManPageLocator([Path("/m")]).sections == ("1", "8")
+    assert ManPageLocator([Path("/m")], ["8", "1", "3pm"]).sections == ("8", "1", "3pm")

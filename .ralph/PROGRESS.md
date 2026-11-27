@@ -293,3 +293,11 @@
 - Target choice is exact name (+ section when set), no alias lookup: a curated command named after an alias only is reported as not installed.
 - `tests/support/ingest_fakes.py`: `FakeProber(texts, failing=)` with `factory`, `allowlists`, `calls`.
 - Executor round 2 had no Bash; the reviewer ran the tests and `make check`. Reviewer: replaced two `type: ignore`s in the test helpers with typed parameters (`VerifyMode`, explicit keyword fields); ticked PLAN (support file and D-055 added to the task) and wrote this entry. `make check` 1838 passed, 11 deselected, coverage gate passed.
+
+## 2026-11-27T06:22:08Z T-6.5 `leva.ingest` (E): IndexBuilder.build — DONE
+- `leva.ingest._builder`: `BuildReport`, `IndexBuilder` (keyword-only; `fingerprint()`, `staleness(index_db)`, `build(target, progress, *, cancel=None)`); `leva.ingest._lock`: `index_lock`, `LOCK_NAME`, `BUSY`; `NullProgress` in `_progress`. D-056 records constructor, build steps, meta keys, lock and error mapping. `leva.ingest` now re-exports the full public API (incl. `DEFAULT_EXTRACTORS`). Ingest branch coverage 100%.
+- `sources`: new read-only `ExecutableScanner.dirs`, `ManPageLocator.dirs`, `ManPageLocator.sections`; the fingerprint reads them, so it always matches what is scanned.
+- For T-6.6 / T-9.2: wiring is in PLAN T-9.2 Steps (D-056). `index.lock` sits next to the index and is never deleted; never put the index, the lock or tmp output inside a scanned dir (the system fingerprint hashes their mtimes). `clock()` must be timezone-aware.
+- For T-8.9: cancel with a `threading.Event`; phases `scan`, `render`, `enrich`, `write`, `finalize` (`total` None for scan and finalize); a cancelled build raises `IngestError("build cancelled")` and keeps the old index. A busy lock is `IngestError("another leva is building the index", hint="wait for it to finish, then try again")`.
+- Errors: every `OSError` of the build becomes `IngestError("cannot write index: <target>")` (chained, no hint); `ContentError`, pipeline/writer/lock `IngestError`s and `KeyboardInterrupt` propagate unchanged after `.new` is removed.
+- Reviewer round 1: approved; removed a duplicated assertion in the interrupt-while-writing test; ticked PLAN (extra files and D-056 added to the task) and wrote this entry. Real-mandoc variant ran (not skipped). `make check` 1867 passed, 11 deselected, coverage gate passed.

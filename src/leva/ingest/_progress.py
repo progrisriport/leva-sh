@@ -23,6 +23,19 @@ class ProgressSink(Protocol):
         ...
 
 
+class NullProgress:
+    """A `ProgressSink` that ignores everything."""
+
+    def phase(self, name: str, total: int | None) -> None:
+        """Ignore the phase."""
+
+    def advance(self, n: int = 1) -> None:
+        """Ignore the advance."""
+
+    def warn(self, message: str) -> None:
+        """Ignore the warning."""
+
+
 class CancelToken(Protocol):
     """Port: tell a running build to stop; `threading.Event` satisfies it."""
 

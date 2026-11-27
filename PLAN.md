@@ -614,9 +614,9 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Curated commands that are not installed are skipped and reported.
 - Accept: `uv run pytest tests/unit/test_ingest_enrich.py -q`; `make check`.
 
-- [ ] T-6.5 `leva.ingest` (E): IndexBuilder.build
-- Files: `src/leva/ingest/{_builder.py,_lock.py}`, `tests/integration/test_ingest_build.py`.
-- Refs: DITS §13; ARCHITECTURE §3.1; TEST-STRATEGY (ingest row, §3); NFR-8, NFR-12; D-020, D-022.
+- [x] T-6.5 `leva.ingest` (E): IndexBuilder.build
+- Files: `src/leva/ingest/{_builder.py,_lock.py,_progress.py,__init__.py}`, `src/leva/sources/{_executables.py,_manpages.py}` (`dirs`/`sections` properties), `tests/integration/test_ingest_build.py`, `tests/unit/{test_ingest_lock.py,test_sources_executables.py,test_sources_manpages.py}`.
+- Refs: DITS §13; ARCHITECTURE §3.1; TEST-STRATEGY (ingest row, §3); NFR-8, NFR-12; D-020, D-022, D-056.
 - Steps:
   - `IndexBuilder(...)`. The DITS signature changes per D-002: no `builtins` argument; added `config_digest` and `clock`.
   - `build(target, progress, *, cancel=None)`:
@@ -811,6 +811,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
   - On success: open the library and route to the StartTarget. On error: red line + hint, and the footer stays.
   - SYSTEM_CHANGED shows a hint "system changed: press r twice to rebuild".
   - Quitting cancels the build cooperatively.
+    - Cancel by passing a `threading.Event` as `cancel` (any object with `is_set()`); a cancelled build raises `IngestError("build cancelled")` and leaves the old index; phases are `scan`, `render`, `enrich`, `write`, `finalize` (`total` None for scan and finalize) (D-056).
 - Accept: `uv run pytest tests/tui/test_ingest_screen.py -q` (fake builder); `make check`.
 
 - [ ] T-8.10 About screen and snapshot suite
@@ -853,6 +854,7 @@ UI note: T-8.1 to T-8.10 use only conventions the design system already approves
 - Refs: ARCHITECTURE §3, §5; DITS §15; D-012, D-014.
 - Steps:
   - Wire paths, config, sources, renderer, extractors, providers, probes and IndexBuilder.
+    - Builder facts (D-056): `IndexBuilder(executables=ExecutableScanner(bin dirs), man=ManPageLocator(man dirs, config.sections), renderer=MandocRenderer(), providers=(CuratedYamlProvider(default_root()), TldrSnapshotProvider(default_root())), system=SystemInfo.detect(), config_digest=config.digest(), clock=<aware now>, leva_version=leva.__version__, content_root=default_root())`; `build(target, progress, *, cancel=None)` raises `IngestError` (lock busy, cannot write, too many unreadable pages, `build cancelled`) or `ContentError`; `KeyboardInterrupt` propagates after clean-up.
   - Staleness: MISSING/VERSION_CHANGED → `needs_build`.
   - `open_library` factory.
   - Headless `--rebuild` with line progress on stderr; Ctrl-C → 130.

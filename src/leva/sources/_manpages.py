@@ -158,6 +158,16 @@ class ManPageLocator:
         self._dirs = tuple(dict.fromkeys(man_dirs))
         self._sections = tuple(sections)
 
+    @property
+    def dirs(self) -> tuple[Path, ...]:
+        """The man directories, deduplicated, in priority order."""
+        return self._dirs
+
+    @property
+    def sections(self) -> tuple[str, ...]:
+        """The man sections scanned under every man directory, in the given order."""
+        return self._sections
+
     def locate(self) -> Iterator[ManFile]:
         """Yield every man page file, sorted by name, section, directory and file name.
 
