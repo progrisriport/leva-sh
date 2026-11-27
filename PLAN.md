@@ -595,7 +595,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Tests with a FakeRenderer (random delays, failures).
 - Accept: `uv run pytest tests/unit/test_ingest_pipeline.py -q`; `make check`.
 
-- [ ] T-6.3 `leva.ingest` (C): catalog assembly
+- [x] T-6.3 `leva.ingest` (C): catalog assembly
 - Files: `src/leva/ingest/_catalog.py`, `tests/unit/test_ingest_catalog.py`.
 - Refs: D-005 (all rules), FR-2, FR-3.
 - Steps:
