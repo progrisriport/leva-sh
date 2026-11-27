@@ -632,8 +632,8 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
   - Integration tests: full build on a fixture tree with FakeRenderer; same digest twice; old index kept on failure; lock contention; real-mandoc variant on synthetic pages.
 - Accept: `uv run pytest -m integration tests/integration/test_ingest_build.py -q`; coverage of `ingest` ≥90%; `make check`.
 
-- [ ] T-6.6 Live ingest on this Mac
-- Files: `tests/live/conftest.py` (session fixture `real_index` built into a tmp LEVA_HOME), `tests/live/test_ingest_live.py`.
+- [x] T-6.6 Live ingest on this Mac
+- Files: `tests/live/conftest.py` (session fixture `real_index` built into a tmp LEVA_HOME), `tests/live/test_ingest_live.py`, `docs/design/leva-sh/reviews/ingest-live.md`.
 - Refs: PRD §7; NFR-3, NFR-15; TEST-STRATEGY (ingest live).
 - Steps:
   - Assert:
