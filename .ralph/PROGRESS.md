@@ -263,3 +263,10 @@
 - Gold mini 30/30 on the fixture, no query swapped. R10 edits: none (T-8.4/T-8.5/T-8.7 lines already match the code). Phase 6 ingest does not use `search`/`library`; T-8.x and T-9.2 rely on the T-5.1/T-5.3 entries above.
 - Warning: the executor saw one failure of `test_sources_probe.py::test_timeout_kills_process_group_and_removes_temp_dir` under load (passed alone and in the reviewer's `make check`); quarantine it with a reason if it repeats.
 - Reviewer round 1: approved; filled the baseline line of the note and recorded the reviewer `make check` (1687 passed, 11 deselected, coverage gate passed).
+
+## 2026-11-27T01:33:17Z T-6.1 `leva.ingest` (A): fingerprint and staleness — DONE
+- `leva.ingest` public API: `Staleness` (MISSING, VERSION_CHANGED, SYSTEM_CHANGED, FRESH), `Fingerprint(version_part, system_part)` (64 lowercase hex each, `meta()`), `dir_stat`, `compute_fingerprint`, `staleness(index_db, current)`, `META_VERSION = "fingerprint_version"`, `META_SYSTEM = "fingerprint_system"`. D-052 records both hash recipes and the `dir_stat` rules; `arch` is excluded.
+- For T-6.5: `compute_fingerprint(*, leva_version, content_version, system, man_dirs, sections, bin_dirs, config_digest)`; write `fp.meta()` items with `IndexWriter.set_meta` before `finalize` (they enter `index_digest`). `IndexBuilder.fingerprint()` returns a `Fingerprint`, not a `str` (refines DITS §13).
+- For T-9.x: `leva_version` is injected; `leva.cli` passes `leva.__version__` (ingest imports neither `leva` nor `importlib.metadata`).
+- `staleness`: any `IndexUnavailableError` (missing, garbage, directory, wrong `user_version`, no meta table) -> MISSING; absent fingerprint keys (fixture factory index) -> VERSION_CHANGED; version checked before system. The connection is always closed.
+- Reviewer round 1: approved; a failed entry stat now falls back to the running max instead of `0` (so it is really ignored when the directory mtime is pre-epoch), with a test; ticked PLAN and wrote this entry (the executor left both undone). Ingest branch coverage 100%.

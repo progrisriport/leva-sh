@@ -569,7 +569,7 @@ Each review writes `docs/design/leva-sh/reviews/phase-N.md` (checked items, find
 
 ### Phase 6 — Ingest
 
-- [ ] T-6.1 `leva.ingest` (A): fingerprint and staleness
+- [x] T-6.1 `leva.ingest` (A): fingerprint and staleness
 - Files: `src/leva/ingest/{__init__.py,_fingerprint.py}`, `tests/unit/test_ingest_staleness.py`.
 - Refs: DITS §13; ADR-0002 §9; D-020.
 - Steps:
